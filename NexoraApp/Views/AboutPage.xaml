@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NexoraApp.Views.AboutPage"
+             Title="Acerca de Nexora">
+    <VerticalStackLayout Padding="20" Spacing="10">
+        <Label Text="Nexora" FontSize="28" FontAttributes="Bold" />
+        <Label Text="Aplicación para gestionar proyectos, asignar tareas y hacer seguimiento del avance de tu equipo." />
+    </VerticalStackLayout>
+</ContentPage>
