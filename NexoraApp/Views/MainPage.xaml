@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:views="clr-namespace:NexoraApp.Views"
+             x:Class="NexoraApp.Views.MainPage"
+             Title="Inicio">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="16">
+
+            <!-- Saludo -->
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                <Border WidthRequest="48" HeightRequest="48" StrokeShape="Ellipse" StrokeThickness="0"
+                        BackgroundColor="{StaticResource FondoSuave}">
+                    <Label x:Name="inicialesLabel" FontAttributes="Bold" TextColor="{StaticResource Texto}"
+                           HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                    <Label x:Name="fechaLabel" FontSize="12" Opacity="0.7" />
+                    <Label x:Name="saludoLabel" FontSize="22" FontAttributes="Bold" />
+                </VerticalStackLayout>
+            </Grid>
+
+            <!-- Tarjetas de resumen -->
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
+                <Border Grid.Column="0" StrokeShape="RoundRectangle 16" Padding="12">
+                    <VerticalStackLayout Spacing="6">
+                        <Border WidthRequest="36" HeightRequest="36" StrokeShape="Ellipse" StrokeThickness="0"
+                                BackgroundColor="{StaticResource FondoSuave}" HorizontalOptions="Start">
+                            <Image Source="icono_carpeta.svg" WidthRequest="20" HeightRequest="20" />
+                        </Border>
+                        <Label x:Name="activosLabel" FontSize="26" FontAttributes="Bold" />
+                        <Label Text="Proyectos activos" FontSize="12" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Grid.Column="1" StrokeShape="RoundRectangle 16" Padding="12">
+                    <VerticalStackLayout Spacing="6">
+                        <Border WidthRequest="36" HeightRequest="36" StrokeShape="Ellipse" StrokeThickness="0"
+                                BackgroundColor="{StaticResource Exito}" HorizontalOptions="Start">
+                            <Image Source="icono_calendario.svg" WidthRequest="20" HeightRequest="20" />
+                        </Border>
+                        <Label x:Name="hoyLabel" FontSize="26" FontAttributes="Bold" />
+                        <Label Text="Tareas de hoy" FontSize="12" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Grid.Column="2" StrokeShape="RoundRectangle 16" Padding="12">
+                    <VerticalStackLayout Spacing="6">
+                        <Border WidthRequest="36" HeightRequest="36" StrokeShape="Ellipse" StrokeThickness="0"
+                                BackgroundColor="{StaticResource Primary}" HorizontalOptions="Start">
+                            <Image Source="icono_alerta.svg" WidthRequest="20" HeightRequest="20" />
+                        </Border>
+                        <Label x:Name="vencidasLabel" FontSize="26" FontAttributes="Bold" />
+                        <Label Text="Vencidas" FontSize="12" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+
+            <!-- Avance general -->
+            <Border StrokeShape="RoundRectangle 20" StrokeThickness="0" Padding="16"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource FondoSuave}, Dark={StaticResource Gray600}}">
+                <VerticalStackLayout Spacing="14">
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Avance general" FontAttributes="Bold" FontSize="16" VerticalOptions="Center" />
+                        <Border Grid.Column="1" StrokeShape="RoundRectangle 10" StrokeThickness="0" Padding="10,4"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource OffBlack}}">
+                            <Label x:Name="mesLabel" FontSize="12" FontAttributes="Bold" />
+                        </Border>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16">
+                        <Grid WidthRequest="120" HeightRequest="120">
+                            <GraphicsView x:Name="donut" />
+                            <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                                <Label x:Name="porcentajeLabel" FontSize="24" FontAttributes="Bold" HorizontalTextAlignment="Center" />
+                                <Label Text="avance" FontSize="12" HorizontalTextAlignment="Center" />
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <VerticalStackLayout Grid.Column="1" Spacing="8" VerticalOptions="Center">
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                                <Border WidthRequest="10" HeightRequest="10" StrokeShape="Ellipse" StrokeThickness="0"
+                                        BackgroundColor="#BDBDBD" VerticalOptions="Center" />
+                                <Label Grid.Column="1" Text="Por hacer" FontSize="13" />
+                                <Label Grid.Column="2" x:Name="porHacerLabel" FontSize="13" FontAttributes="Bold" />
+                            </Grid>
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                                <Border WidthRequest="10" HeightRequest="10" StrokeShape="Ellipse" StrokeThickness="0"
+                                        BackgroundColor="{StaticResource Primary}" VerticalOptions="Center" />
+                                <Label Grid.Column="1" Text="En progreso" FontSize="13" />
+                                <Label Grid.Column="2" x:Name="enProgresoLabel" FontSize="13" FontAttributes="Bold" />
+                            </Grid>
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                                <Border WidthRequest="10" HeightRequest="10" StrokeShape="Ellipse" StrokeThickness="0"
+                                        BackgroundColor="#757575" VerticalOptions="Center" />
+                                <Label Grid.Column="1" Text="En revisión" FontSize="13" />
+                                <Label Grid.Column="2" x:Name="enRevisionLabel" FontSize="13" FontAttributes="Bold" />
+                            </Grid>
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                                <Border WidthRequest="10" HeightRequest="10" StrokeShape="Ellipse" StrokeThickness="0"
+                                        BackgroundColor="{StaticResource Exito}" VerticalOptions="Center" />
+                                <Label Grid.Column="1" Text="Hecha" FontSize="13" />
+                                <Label Grid.Column="2" x:Name="hechaLabel" FontSize="13" FontAttributes="Bold" />
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <Label Text="Tareas completadas esta semana" FontSize="12" />
+                    <Grid x:Name="semanaGrid" ColumnDefinitions="*,*,*,*,*,*,*" RowDefinitions="80,Auto"
+                          ColumnSpacing="6" RowSpacing="4" />
+
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Proyectos activos -->
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Text="Proyectos activos" FontAttributes="Bold" FontSize="18" VerticalOptions="Center" />
+                <Label Grid.Column="1" Text="Ver todos" FontSize="13" TextDecorations="Underline" VerticalOptions="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnVerTodosTapped" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </Grid>
+
+            <CollectionView x:Name="proyectosActivos" HeightRequest="170">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Horizontal" ItemSpacing="12" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="views:ProyectoResumen">
+                        <Border WidthRequest="250" StrokeShape="RoundRectangle 16" Padding="14">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnProyectoTapped" />
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout Spacing="8">
+                                <Border StrokeShape="RoundRectangle 8" StrokeThickness="0" Padding="8,3"
+                                        BackgroundColor="{StaticResource FondoSuave}" HorizontalOptions="Start">
+                                    <Label Text="{Binding Estado}" FontSize="12" TextColor="{StaticResource Texto}" />
+                                </Border>
+                                <Label Text="{Binding Nombre}" FontAttributes="Bold" FontSize="16"
+                                       MaxLines="2" LineBreakMode="TailTruncation" />
+                                <ProgressBar Progress="{Binding Avance}" ProgressColor="{StaticResource Primary}" />
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <Label Text="{Binding Entrega}" FontSize="12" />
+                                    <Label Grid.Column="1" Text="{Binding AvanceTexto}" FontSize="12" FontAttributes="Bold" />
+                                </Grid>
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- Tareas de hoy y vencidas -->
+            <Label Text="Tareas de hoy y vencidas" FontAttributes="Bold" FontSize="18" />
+
+            <VerticalStackLayout x:Name="tareasLista" Spacing="8">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="views:TareaResumen">
+                        <Border StrokeShape="RoundRectangle 14" Padding="12">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnTareaTapped" />
+                            </Border.GestureRecognizers>
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <VerticalStackLayout Spacing="2">
+                                    <Label Text="{Binding Titulo}" FontAttributes="Bold" MaxLines="1" LineBreakMode="TailTruncation" />
+                                    <Label Text="{Binding Proyecto}" FontSize="12" Opacity="0.7" />
+                                    <Label Text="{Binding Vencimiento}" FontSize="12">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding EstaVencida}" Value="True">
+                                                <Setter Property="FontAttributes" Value="Bold" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </VerticalStackLayout>
+                                <Border Grid.Column="1" StrokeShape="RoundRectangle 8" StrokeThickness="0" Padding="8,3"
+                                        BackgroundColor="{Binding PrioridadFondo}" VerticalOptions="Start">
+                                    <Label Text="{Binding Prioridad}" FontSize="12" TextColor="{StaticResource Texto}" />
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+
+            <Label x:Name="sinTareasLabel" Text="No tienes tareas para hoy ni vencidas." IsVisible="False" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
