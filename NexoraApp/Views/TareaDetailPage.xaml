@@ -1,12 +1,99 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:views="clr-namespace:NexoraApp.Views"
              x:Class="NexoraApp.Views.TareaDetailPage"
-             Title="Detalle de la tarea">
+             Title="Tarea">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Order="Primary" Priority="0" Clicked="OnEditarClicked"
+                     IconImageSource="{AppThemeBinding Light=icono_editar.svg, Dark=icono_editar_claro.svg}" />
+        <ToolbarItem Order="Primary" Priority="1" Clicked="OnEliminarClicked"
+                     IconImageSource="{AppThemeBinding Light=icono_eliminar.svg, Dark=icono_eliminar_claro.svg}" />
+    </ContentPage.ToolbarItems>
 
     <ScrollView>
-        <VerticalStackLayout x:Name="container" Padding="16" Spacing="8">
+        <VerticalStackLayout Padding="16" Spacing="14">
+
+            <!-- Encabezado -->
+            <HorizontalStackLayout Spacing="8">
+                <Border x:Name="estadoChip" StrokeShape="RoundRectangle 12" StrokeThickness="0" Padding="10,4">
+                    <Label x:Name="estadoLabel" FontSize="12" FontAttributes="Bold" TextColor="#212121" />
+                </Border>
+                <Border x:Name="prioridadChip" StrokeShape="RoundRectangle 12" StrokeThickness="0" Padding="10,4">
+                    <Label x:Name="prioridadLabel" FontSize="12" FontAttributes="Bold" />
+                </Border>
+            </HorizontalStackLayout>
+            <Label x:Name="tituloLabel" FontSize="22" FontAttributes="Bold" />
+            <Label x:Name="descripcionLabel" FontSize="14" Opacity="0.8" />
+
+            <!-- Proyecto / Responsable / Fecha -->
+            <Border StrokeShape="RoundRectangle 14" Padding="14">
+                <VerticalStackLayout Spacing="10">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Image Source="icono_carpeta.svg" WidthRequest="18" HeightRequest="18" />
+                        <Label x:Name="proyectoLabel" Grid.Column="1" />
+                    </Grid>
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Border x:Name="avatar" WidthRequest="26" HeightRequest="26" StrokeShape="Ellipse" StrokeThickness="0">
+                            <Label x:Name="inicialesLabel" FontSize="10" FontAttributes="Bold" TextColor="#212121"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <Label x:Name="responsableLabel" Grid.Column="1" VerticalOptions="Center" />
+                    </Grid>
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Image Source="icono_calendario_gris.svg" WidthRequest="18" HeightRequest="18" />
+                        <Label x:Name="fechaLabel" Grid.Column="1" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Cambiar estado -->
+            <Label Text="Cambiar estado" FontSize="16" FontAttributes="Bold" />
+            <Grid x:Name="estadoGrid" ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="8" />
+
+            <!-- Subtareas -->
+            <Grid ColumnDefinitions="*,Auto" Margin="0,8,0,0">
+                <Label Text="Subtareas" FontSize="16" FontAttributes="Bold" />
+                <Label x:Name="subtareasContador" Grid.Column="1" FontSize="13" Opacity="0.7" />
+            </Grid>
+            <ProgressBar x:Name="subtareasBarra" ProgressColor="#E67514" />
+            <VerticalStackLayout x:Name="subtareasLayout" Spacing="2" />
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                <Entry x:Name="subtareaEntry" Placeholder="Nueva subtarea" ReturnType="Done" Completed="OnAgregarSubtarea" />
+                <Button Grid.Column="1" Text="Añadir" Clicked="OnAgregarSubtarea"
+                        BackgroundColor="#E67514" TextColor="#212121" CornerRadius="20" />
+            </Grid>
+
+            <!-- Comentarios -->
+            <Label x:Name="comentariosTitulo" FontSize="16" FontAttributes="Bold" Margin="0,8,0,0" />
+            <VerticalStackLayout x:Name="listaComentarios" Spacing="10">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="views:ComentarioItem">
+                        <Border StrokeShape="RoundRectangle 14" Padding="12">
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                                <Border WidthRequest="32" HeightRequest="32" StrokeShape="Ellipse" StrokeThickness="0"
+                                        BackgroundColor="{Binding Fondo}" VerticalOptions="Start">
+                                    <Label Text="{Binding Iniciales}" FontSize="11" FontAttributes="Bold" TextColor="#212121"
+                                           HorizontalOptions="Center" VerticalOptions="Center" />
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <Label Text="{Binding Autor}" FontAttributes="Bold" FontSize="13" />
+                                        <Label Grid.Column="1" Text="{Binding Fecha}" FontSize="11" Opacity="0.6" />
+                                    </Grid>
+                                    <Label Text="{Binding Texto}" FontSize="13" />
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8" Margin="0,0,0,24">
+                <Entry x:Name="comentarioEntry" Placeholder="Escribe un comentario" ReturnType="Send" Completed="OnEnviarComentario" />
+                <Button Grid.Column="1" Text="Enviar" Clicked="OnEnviarComentario"
+                        BackgroundColor="#E67514" TextColor="#212121" CornerRadius="20" />
+            </Grid>
         </VerticalStackLayout>
     </ScrollView>
-
 </ContentPage>

@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Microsoft.EntityFrameworkCore;
 
 namespace NexoraApp.DataAccess
 {
@@ -10,6 +7,9 @@ namespace NexoraApp.DataAccess
         public DbSet<Usuario> Usuarios { get; set; } = null!;
         public DbSet<Proyecto> Proyectos { get; set; } = null!;
         public DbSet<Tarea> Tareas { get; set; } = null!;
+        public DbSet<Miembro> Miembros { get; set; } = null!;
+        public DbSet<Subtarea> Subtareas { get; set; } = null!;
+        public DbSet<Comentario> Comentarios { get; set; } = null!;
 
         // Las fechas de las tareas se calculan desde hoy, así el resumen
         // (tareas de hoy, vencidas, completadas de la semana) siempre tiene datos.
@@ -38,6 +38,31 @@ namespace NexoraApp.DataAccess
                 new Proyecto(3, "Campaña de lanzamiento", "Plan de comunicación y contenidos para el lanzamiento del nuevo producto.", new DateTime(2026, 10, 20), new DateTime(2026, 12, 15), "Planificado", 5),
                 new Proyecto(4, "Migración a la nube", "Traslado de servidores y bases de datos a la nube.", new DateTime(2026, 7, 1), new DateTime(2026, 10, 31), "Pausado", 6),
                 new Proyecto(5, "Portal de clientes", "Portal de autogestión para clientes: facturas, tickets y documentos.", new DateTime(2026, 3, 1), new DateTime(2026, 9, 10), "Finalizado", 2)
+            );
+
+            modelBuilder.Entity<Miembro>().HasData(
+                new Miembro(1, 1, 2), new Miembro(2, 1, 1), new Miembro(3, 1, 3), new Miembro(4, 1, 4),
+                new Miembro(5, 2, 5), new Miembro(6, 2, 6), new Miembro(7, 2, 4),
+                new Miembro(8, 3, 5), new Miembro(9, 3, 1),
+                new Miembro(10, 4, 6), new Miembro(11, 4, 1),
+                new Miembro(12, 5, 2), new Miembro(13, 5, 3)
+            );
+
+            modelBuilder.Entity<Subtarea>().HasData(
+                new Subtarea(1, 7, "Wireframe de la página móvil", true),
+                new Subtarea(2, 7, "Versión de escritorio", false),
+                new Subtarea(3, 7, "Preparar prototipo para la revisión", false),
+                new Subtarea(4, 8, "Credenciales del entorno de pruebas", true),
+                new Subtarea(5, 8, "Flujo de pago completo", false),
+                new Subtarea(6, 1, "Texto de misión", true),
+                new Subtarea(7, 1, "Texto de visión", false),
+                new Subtarea(8, 1, "Perfiles del equipo", false)
+            );
+
+            modelBuilder.Entity<Comentario>().HasData(
+                new Comentario(1, 7, 1, "Recuerden usar la nueva paleta de la guía de marca.", Hoy.AddDays(-1).AddHours(10)),
+                new Comentario(2, 7, 3, "Listo el wireframe móvil, sigo con la versión de escritorio.", Hoy.AddHours(9)),
+                new Comentario(3, 8, 6, "La pasarela responde bien en el entorno de pruebas.", Hoy.AddDays(-1).AddHours(15))
             );
 
             modelBuilder.Entity<Tarea>().HasData(
@@ -69,6 +94,20 @@ namespace NexoraApp.DataAccess
     {
         public DateTime? FechaCompletada { get; set; }
         public Proyecto Proyecto { get; set; } = null!;
+        public Usuario Usuario { get; set; } = null!;
+    }
+
+    // Miembros de cada proyecto (relación muchos a muchos entre Proyecto y Usuario)
+    public record Miembro(int Id, int ProyectoId, int UsuarioId)
+    {
+        public Proyecto Proyecto { get; set; } = null!;
+        public Usuario Usuario { get; set; } = null!;
+    }
+
+    public record Subtarea(int Id, int TareaId, string Titulo, bool Completada);
+
+    public record Comentario(int Id, int TareaId, int UsuarioId, string Texto, DateTime Fecha)
+    {
         public Usuario Usuario { get; set; } = null!;
     }
 }

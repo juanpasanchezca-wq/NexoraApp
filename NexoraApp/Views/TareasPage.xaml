@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:handlers="clr-namespace:NexoraApp.Handlers"
+             xmlns:views="clr-namespace:NexoraApp.Views"
              x:Class="NexoraApp.Views.TareasPage"
              Title="Tareas">
 
@@ -12,9 +13,118 @@
             ShowsResults="True" />
     </Shell.SearchHandler>
 
-    <ScrollView>
-        <VerticalStackLayout x:Name="container" Padding="16" Spacing="10">
-        </VerticalStackLayout>
-    </ScrollView>
+    <ContentPage.Resources>
+        <!-- Tarjeta de tarea: se usa en la lista y en el Kanban -->
+        <DataTemplate x:Key="TarjetaTarea" x:DataType="views:TareaCard">
+            <Border StrokeShape="RoundRectangle 14" Padding="12">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnTareaTapped" />
+                </Border.GestureRecognizers>
+                <VerticalStackLayout Spacing="6">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Label Text="{Binding Titulo}" FontAttributes="Bold" MaxLines="2" LineBreakMode="TailTruncation" />
+                        <Border Grid.Column="1" StrokeShape="RoundRectangle 10" StrokeThickness="0" Padding="8,2"
+                                BackgroundColor="{Binding FondoPrioridad}" VerticalOptions="Start">
+                            <Label Text="{Binding Prioridad}" FontSize="11" FontAttributes="Bold" />
+                        </Border>
+                    </Grid>
+                    <Label Text="{Binding Proyecto}" FontSize="12" Opacity="0.7" />
+                    <Grid ColumnDefinitions="*,Auto">
+                        <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                            <Image Source="icono_calendario_gris.svg" WidthRequest="14" HeightRequest="14" />
+                            <Label Text="{Binding Vence}" TextColor="{Binding ColorVence}" FontSize="12" />
+                        </HorizontalStackLayout>
+                        <Border Grid.Column="1" WidthRequest="26" HeightRequest="26" StrokeShape="Ellipse" StrokeThickness="0"
+                                BackgroundColor="{Binding FondoAvatar}">
+                            <Label Text="{Binding Iniciales}" FontSize="10" FontAttributes="Bold" TextColor="#212121"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+        </DataTemplate>
+    </ContentPage.Resources>
 
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Padding="16,16,16,96" Spacing="14">
+
+                <!-- Lista / Kanban -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="6">
+                    <Border x:Name="vistaLista" Grid.Column="0" StrokeShape="RoundRectangle 18" StrokeThickness="0" Padding="0,10">
+                        <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnVistaListaTapped" /></Border.GestureRecognizers>
+                        <Label x:Name="vistaListaLabel" Text="Lista" HorizontalOptions="Center" />
+                    </Border>
+                    <Border x:Name="vistaKanban" Grid.Column="1" StrokeShape="RoundRectangle 18" StrokeThickness="0" Padding="0,10">
+                        <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnVistaKanbanTapped" /></Border.GestureRecognizers>
+                        <Label x:Name="vistaKanbanLabel" Text="Kanban" HorizontalOptions="Center" />
+                    </Border>
+                </Grid>
+
+                <!-- Filtros (se dibujan en el código) -->
+                <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                    <HorizontalStackLayout x:Name="chips" Spacing="8" />
+                </ScrollView>
+
+                <!-- Vista de lista: una sección por estado -->
+                <VerticalStackLayout x:Name="panelLista" Spacing="16">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="views:GrupoTareas">
+                            <VerticalStackLayout Spacing="8" IsVisible="{Binding ConTareas}">
+                                <HorizontalStackLayout Spacing="8">
+                                    <Border WidthRequest="10" HeightRequest="10" StrokeShape="Ellipse" StrokeThickness="0"
+                                            BackgroundColor="{Binding Color}" VerticalOptions="Center" />
+                                    <Label Text="{Binding Titulo}" FontSize="16" FontAttributes="Bold" />
+                                    <Label Text="{Binding Cantidad}" FontSize="14" Opacity="0.6" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                                <VerticalStackLayout Spacing="8"
+                                                     BindableLayout.ItemsSource="{Binding Tareas}"
+                                                     BindableLayout.ItemTemplate="{StaticResource TarjetaTarea}" />
+                            </VerticalStackLayout>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+                <!-- Vista Kanban: una columna por estado -->
+                <ScrollView x:Name="panelKanban" Orientation="Horizontal" IsVisible="False" HorizontalScrollBarVisibility="Never">
+                    <HorizontalStackLayout x:Name="kanbanColumnas" Spacing="12">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="views:GrupoTareas">
+                                <Border WidthRequest="270" StrokeShape="RoundRectangle 16" Padding="10" BackgroundColor="#14808080">
+                                    <VerticalStackLayout Spacing="10">
+                                        <HorizontalStackLayout Spacing="8">
+                                            <Border WidthRequest="10" HeightRequest="10" StrokeShape="Ellipse" StrokeThickness="0"
+                                                    BackgroundColor="{Binding Color}" VerticalOptions="Center" />
+                                            <Label Text="{Binding Titulo}" FontAttributes="Bold" />
+                                            <Label Text="{Binding Cantidad}" Opacity="0.6" />
+                                        </HorizontalStackLayout>
+                                        <VerticalStackLayout Spacing="8"
+                                                             BindableLayout.ItemsSource="{Binding Tareas}"
+                                                             BindableLayout.ItemTemplate="{StaticResource TarjetaTarea}" />
+                                        <Label Text="Sin tareas" FontSize="12" Opacity="0.6" HorizontalOptions="Center"
+                                               IsVisible="{Binding Vacio}" />
+                                    </VerticalStackLayout>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </HorizontalStackLayout>
+                </ScrollView>
+
+                <Label x:Name="vacioLabel" Text="No hay tareas con este filtro." IsVisible="False"
+                       HorizontalOptions="Center" Margin="0,30,0,0" Opacity="0.7" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Botón flotante: nueva tarea -->
+        <Border StrokeShape="RoundRectangle 28" StrokeThickness="0" BackgroundColor="#E67514"
+                Padding="18,14" HorizontalOptions="End" VerticalOptions="End" Margin="16">
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnNuevaTareaTapped" />
+            </Border.GestureRecognizers>
+            <HorizontalStackLayout Spacing="8">
+                <Image Source="icono_mas.svg" WidthRequest="22" HeightRequest="22" />
+                <Label Text="Nueva tarea" FontAttributes="Bold" TextColor="#212121" VerticalOptions="Center" />
+            </HorizontalStackLayout>
+        </Border>
+    </Grid>
 </ContentPage>
