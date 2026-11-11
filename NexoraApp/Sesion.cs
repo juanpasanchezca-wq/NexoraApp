@@ -8,6 +8,7 @@ namespace NexoraApp
 
         // Solo para la demostración de estados: 0 = normal, 1 = sin datos, 2 = error de carga.
         // Se cambia desde el menú lateral ("Probar estados").
-        public static int DemoEstado { get; set; } = 0;
+        public static int DemoEstado { get; set; } = 0; 
+
     }
 }
