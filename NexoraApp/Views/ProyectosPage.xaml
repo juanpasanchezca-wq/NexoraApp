@@ -2,6 +2,8 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:handlers="clr-namespace:NexoraApp.Handlers"
+             xmlns:views="clr-namespace:NexoraApp.Views"
+             xmlns:comp="clr-namespace:NexoraApp.Views.Componentes"
              x:Class="NexoraApp.Views.ProyectosPage"
              Title="Proyectos">
 
@@ -12,9 +14,85 @@
             ShowsResults="True" />
     </Shell.SearchHandler>
 
-    <ScrollView>
-        <VerticalStackLayout x:Name="container" Padding="16" Spacing="10">
-        </VerticalStackLayout>
-    </ScrollView>
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Padding="16,16,16,96" Spacing="14">
 
+                <!-- Filtros por estado (se dibujan en el código) -->
+                <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                    <HorizontalStackLayout x:Name="chips" Spacing="8" />
+                </ScrollView>
+
+                <!-- Estados: cargando, vacío y error -->
+                <comp:SkeletonLista x:Name="skeleton" IsVisible="False" />
+                <comp:EstadoVista x:Name="estadoVista" IsVisible="False" />
+
+                <!-- Tarjetas de proyecto -->
+                <VerticalStackLayout x:Name="lista" Spacing="12">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="views:ProyectoItem">
+                            <Border StrokeShape="RoundRectangle 16" Padding="14">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnProyectoTapped" />
+                                </Border.GestureRecognizers>
+                                <VerticalStackLayout Spacing="10">
+                                    <!-- Chip de estado -->
+                                    <Border StrokeShape="RoundRectangle 12" StrokeThickness="0" Padding="10,4"
+                                            BackgroundColor="{Binding FondoEstado}" HorizontalOptions="Start">
+                                        <HorizontalStackLayout Spacing="6">
+                                            <Border WidthRequest="8" HeightRequest="8" StrokeShape="Ellipse" StrokeThickness="0"
+                                                    BackgroundColor="{Binding PuntoEstado}" VerticalOptions="Center" />
+                                            <Label Text="{Binding Estado}" FontSize="12" FontAttributes="Bold" />
+                                        </HorizontalStackLayout>
+                                    </Border>
+
+                                    <Label Text="{Binding Nombre}" FontSize="18" FontAttributes="Bold" />
+                                    <Label Text="{Binding Descripcion}" FontSize="13" Opacity="0.75"
+                                           MaxLines="2" LineBreakMode="TailTruncation" />
+
+                                    <!-- Progreso -->
+                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                        <ProgressBar Progress="{Binding AvanceProgreso}" ProgressColor="#E67514" VerticalOptions="Center" />
+                                        <Label Grid.Column="1" Text="{Binding Avance, StringFormat='{0}%'}" FontSize="12" FontAttributes="Bold" />
+                                    </Grid>
+
+                                    <!-- Pie: entrega y equipo -->
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                            <Image Source="icono_calendario_gris.svg" WidthRequest="16" HeightRequest="16" />
+                                            <Label Text="{Binding Entrega}" FontSize="12" Opacity="0.75" />
+                                        </HorizontalStackLayout>
+                                        <HorizontalStackLayout Grid.Column="1" Spacing="-8"
+                                                               BindableLayout.ItemsSource="{Binding Avatares}">
+                                            <BindableLayout.ItemTemplate>
+                                                <DataTemplate x:DataType="views:AvatarItem">
+                                                    <Border WidthRequest="28" HeightRequest="28" StrokeShape="Ellipse"
+                                                            StrokeThickness="2" Stroke="White" BackgroundColor="{Binding Fondo}">
+                                                        <Label Text="{Binding Iniciales}" FontSize="10" FontAttributes="Bold" TextColor="#212121"
+                                                               HorizontalOptions="Center" VerticalOptions="Center" />
+                                                    </Border>
+                                                </DataTemplate>
+                                            </BindableLayout.ItemTemplate>
+                                        </HorizontalStackLayout>
+                                    </Grid>
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Botón flotante: nuevo proyecto -->
+        <Border x:Name="fab" StrokeShape="RoundRectangle 28" StrokeThickness="0" BackgroundColor="#E67514"
+                Padding="18,14" HorizontalOptions="End" VerticalOptions="End" Margin="16">
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnNuevoProyectoTapped" />
+            </Border.GestureRecognizers>
+            <HorizontalStackLayout Spacing="8">
+                <Image Source="icono_nueva_carpeta.svg" WidthRequest="22" HeightRequest="22" />
+                <Label Text="Nuevo proyecto" FontAttributes="Bold" TextColor="#212121" VerticalOptions="Center" />
+            </HorizontalStackLayout>
+        </Border>
+    </Grid>
 </ContentPage>

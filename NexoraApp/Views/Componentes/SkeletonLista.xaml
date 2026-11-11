@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NexoraApp.Views.Componentes.SkeletonLista">
+
+    <!-- Tarjetas "fantasma" que parpadean mientras se cargan los datos -->
+    <VerticalStackLayout x:Name="contenedor" Spacing="12">
+        <Border StrokeShape="RoundRectangle 16" Padding="14">
+            <VerticalStackLayout Spacing="10">
+                <BoxView WidthRequest="80" HeightRequest="20" CornerRadius="10" Color="#33808080" HorizontalOptions="Start" />
+                <BoxView WidthRequest="200" HeightRequest="18" CornerRadius="6" Color="#33808080" HorizontalOptions="Start" />
+                <BoxView HeightRequest="12" CornerRadius="6" Color="#33808080" />
+                <BoxView HeightRequest="12" CornerRadius="6" Color="#33808080" Margin="0,0,60,0" />
+                <BoxView HeightRequest="8" CornerRadius="4" Color="#33808080" />
+            </VerticalStackLayout>
+        </Border>
+        <Border StrokeShape="RoundRectangle 16" Padding="14">
+            <VerticalStackLayout Spacing="10">
+                <BoxView WidthRequest="80" HeightRequest="20" CornerRadius="10" Color="#33808080" HorizontalOptions="Start" />
+                <BoxView WidthRequest="200" HeightRequest="18" CornerRadius="6" Color="#33808080" HorizontalOptions="Start" />
+                <BoxView HeightRequest="12" CornerRadius="6" Color="#33808080" />
+                <BoxView HeightRequest="12" CornerRadius="6" Color="#33808080" Margin="0,0,60,0" />
+                <BoxView HeightRequest="8" CornerRadius="4" Color="#33808080" />
+            </VerticalStackLayout>
+        </Border>
+        <Border StrokeShape="RoundRectangle 16" Padding="14">
+            <VerticalStackLayout Spacing="10">
+                <BoxView WidthRequest="80" HeightRequest="20" CornerRadius="10" Color="#33808080" HorizontalOptions="Start" />
+                <BoxView WidthRequest="200" HeightRequest="18" CornerRadius="6" Color="#33808080" HorizontalOptions="Start" />
+                <BoxView HeightRequest="12" CornerRadius="6" Color="#33808080" />
+                <BoxView HeightRequest="12" CornerRadius="6" Color="#33808080" Margin="0,0,60,0" />
+                <BoxView HeightRequest="8" CornerRadius="4" Color="#33808080" />
+            </VerticalStackLayout>
+        </Border>
+    </VerticalStackLayout>
+</ContentView>

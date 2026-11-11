@@ -1,12 +1,167 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:views="clr-namespace:NexoraApp.Views"
              x:Class="NexoraApp.Views.ProyectoDetailPage"
-             Title="Detalle del proyecto">
+             Title="Proyecto">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Order="Primary" Priority="0" Clicked="OnEditarClicked"
+                     IconImageSource="{AppThemeBinding Light=icono_editar.svg, Dark=icono_editar_claro.svg}" />
+        <ToolbarItem Order="Primary" Priority="1" Clicked="OnEliminarClicked"
+                     IconImageSource="{AppThemeBinding Light=icono_eliminar.svg, Dark=icono_eliminar_claro.svg}" />
+    </ContentPage.ToolbarItems>
 
     <ScrollView>
-        <VerticalStackLayout x:Name="container" Padding="16" Spacing="8">
+        <VerticalStackLayout Padding="16" Spacing="14">
+
+            <!-- Encabezado -->
+            <Border x:Name="estadoChip" StrokeShape="RoundRectangle 12" StrokeThickness="0" Padding="10,4" HorizontalOptions="Start">
+                <HorizontalStackLayout Spacing="6">
+                    <Border x:Name="estadoPunto" WidthRequest="8" HeightRequest="8" StrokeShape="Ellipse" StrokeThickness="0" VerticalOptions="Center" />
+                    <Label x:Name="estadoLabel" FontSize="12" FontAttributes="Bold" />
+                </HorizontalStackLayout>
+            </Border>
+            <Label x:Name="nombreLabel" FontSize="24" FontAttributes="Bold" />
+            <Label x:Name="descripcionLabel" FontSize="14" Opacity="0.8" />
+
+            <!-- Inicio / Entrega / Responsable -->
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                <Border Grid.Column="0" StrokeShape="RoundRectangle 12" Padding="10">
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="Inicio" FontSize="11" Opacity="0.7" />
+                        <Label x:Name="inicioLabel" FontSize="13" FontAttributes="Bold" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Column="1" StrokeShape="RoundRectangle 12" Padding="10">
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="Entrega" FontSize="11" Opacity="0.7" />
+                        <Label x:Name="entregaLabel" FontSize="13" FontAttributes="Bold" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Column="2" StrokeShape="RoundRectangle 12" Padding="10">
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="Responsable" FontSize="11" Opacity="0.7" />
+                        <Label x:Name="responsableLabel" FontSize="13" FontAttributes="Bold" LineBreakMode="TailTruncation" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+
+            <!-- Pestañas -->
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="6">
+                <Border x:Name="tab0" Grid.Column="0" StrokeShape="RoundRectangle 18" StrokeThickness="0" Padding="0,10">
+                    <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnTabTapped" /></Border.GestureRecognizers>
+                    <Label x:Name="tabLabel0" Text="Resumen" HorizontalOptions="Center" FontSize="13" />
+                </Border>
+                <Border x:Name="tab1" Grid.Column="1" StrokeShape="RoundRectangle 18" StrokeThickness="0" Padding="0,10">
+                    <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnTabTapped" /></Border.GestureRecognizers>
+                    <Label x:Name="tabLabel1" Text="Tareas" HorizontalOptions="Center" FontSize="13" />
+                </Border>
+                <Border x:Name="tab2" Grid.Column="2" StrokeShape="RoundRectangle 18" StrokeThickness="0" Padding="0,10">
+                    <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnTabTapped" /></Border.GestureRecognizers>
+                    <Label x:Name="tabLabel2" Text="Miembros" HorizontalOptions="Center" FontSize="13" />
+                </Border>
+            </Grid>
+
+            <!-- Pestaña 1: Resumen -->
+            <VerticalStackLayout x:Name="panelResumen" Spacing="12">
+                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="10">
+                    <Border Grid.Row="0" Grid.Column="0" StrokeShape="RoundRectangle 14" Padding="12">
+                        <VerticalStackLayout>
+                            <Label x:Name="totalLabel" FontSize="24" FontAttributes="Bold" />
+                            <Label Text="Tareas en total" FontSize="12" Opacity="0.7" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Grid.Row="0" Grid.Column="1" StrokeShape="RoundRectangle 14" Padding="12">
+                        <VerticalStackLayout>
+                            <Label x:Name="hechasLabel" FontSize="24" FontAttributes="Bold" TextColor="#06923E" />
+                            <Label Text="Completadas" FontSize="12" Opacity="0.7" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Grid.Row="1" Grid.Column="0" StrokeShape="RoundRectangle 14" Padding="12">
+                        <VerticalStackLayout>
+                            <Label x:Name="activasLabel" FontSize="24" FontAttributes="Bold" TextColor="#E67514" />
+                            <Label Text="En curso" FontSize="12" Opacity="0.7" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Grid.Row="1" Grid.Column="1" StrokeShape="RoundRectangle 14" Padding="12">
+                        <VerticalStackLayout>
+                            <Label x:Name="vencidasLabel" FontSize="24" FontAttributes="Bold" />
+                            <Label Text="Vencidas" FontSize="12" Opacity="0.7" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <Border StrokeShape="RoundRectangle 14" Padding="14">
+                    <VerticalStackLayout Spacing="8">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Text="Avance del proyecto" FontAttributes="Bold" />
+                            <Label x:Name="avanceLabel" Grid.Column="1" FontAttributes="Bold" />
+                        </Grid>
+                        <ProgressBar x:Name="avanceBarra" ProgressColor="#E67514" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Label Text="Tareas por estado" FontSize="16" FontAttributes="Bold" Margin="0,4,0,0" />
+                <VerticalStackLayout x:Name="porEstado" Spacing="10">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="views:EstadoFila">
+                            <Grid ColumnDefinitions="110,*,Auto" ColumnSpacing="10">
+                                <Label Text="{Binding Estado}" FontSize="13" VerticalOptions="Center" />
+                                <ProgressBar Grid.Column="1" Progress="{Binding Progreso}" ProgressColor="{Binding Color}" VerticalOptions="Center" />
+                                <Label Grid.Column="2" Text="{Binding Cantidad}" FontSize="13" FontAttributes="Bold" VerticalOptions="Center" />
+                            </Grid>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+
+            <!-- Pestaña 2: Tareas -->
+            <VerticalStackLayout x:Name="panelTareas" Spacing="10" IsVisible="False">
+                <Label x:Name="sinTareasLabel" Text="Este proyecto aún no tiene tareas." IsVisible="False" Opacity="0.7" HorizontalOptions="Center" Margin="0,20" />
+                <VerticalStackLayout x:Name="listaTareas" Spacing="10">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="views:TareaFila">
+                            <Border StrokeShape="RoundRectangle 14" Padding="12">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnTareaTapped" />
+                                </Border.GestureRecognizers>
+                                <Grid ColumnDefinitions="6,*" ColumnSpacing="12">
+                                    <BoxView Color="{Binding ColorEstado}" CornerRadius="3" />
+                                    <VerticalStackLayout Grid.Column="1" Spacing="3">
+                                        <Label Text="{Binding Titulo}" FontAttributes="Bold" />
+                                        <Label Text="{Binding Detalle}" FontSize="12" Opacity="0.75" />
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+
+            <!-- Pestaña 3: Miembros -->
+            <VerticalStackLayout x:Name="panelMiembros" Spacing="10" IsVisible="False">
+                <VerticalStackLayout x:Name="listaMiembros" Spacing="10">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="views:MiembroItem">
+                            <Border StrokeShape="RoundRectangle 14" Padding="12">
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                                    <Border WidthRequest="40" HeightRequest="40" StrokeShape="Ellipse" StrokeThickness="0"
+                                            BackgroundColor="{Binding Fondo}">
+                                        <Label Text="{Binding Iniciales}" FontAttributes="Bold" TextColor="#212121"
+                                               HorizontalOptions="Center" VerticalOptions="Center" />
+                                    </Border>
+                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                        <Label Text="{Binding Nombre}" FontAttributes="Bold" />
+                                        <Label Text="{Binding Rol}" FontSize="12" Opacity="0.7" />
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+
         </VerticalStackLayout>
     </ScrollView>
-
 </ContentPage>

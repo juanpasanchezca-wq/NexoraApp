@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NexoraApp.Views.TareaFormPage"
+             Title="Nueva tarea">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Guardar" Order="Primary" Clicked="OnGuardarClicked" />
+    </ContentPage.ToolbarItems>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+
+            <Label Text="Título" FontAttributes="Bold" />
+            <Entry x:Name="tituloEntry" Placeholder="Ej. Diseñar maqueta de inicio" />
+
+            <Label Text="Descripción" FontAttributes="Bold" />
+            <Editor x:Name="descripcionEditor" Placeholder="¿Qué hay que hacer?" HeightRequest="100" AutoSize="Disabled" />
+
+            <Label Text="Proyecto" FontAttributes="Bold" />
+            <Picker x:Name="proyectoPicker" Title="Selecciona el proyecto" ItemDisplayBinding="{Binding Nombre}" />
+
+            <Label Text="Responsable" FontAttributes="Bold" />
+            <Picker x:Name="responsablePicker" Title="Selecciona al responsable" ItemDisplayBinding="{Binding Nombre}" />
+
+            <Label Text="Fecha límite" FontAttributes="Bold" />
+            <DatePicker x:Name="fechaPicker" />
+
+            <Label Text="Prioridad" FontAttributes="Bold" />
+            <Grid x:Name="prioridadGrid" ColumnDefinitions="*,*,*" ColumnSpacing="8" />
+
+            <Label Text="Estado" FontAttributes="Bold" />
+            <Grid x:Name="estadoGrid" ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="8" />
+
+            <Label x:Name="errorLabel" TextColor="#D32F2F" IsVisible="False" />
+
+            <Button Text="Guardar tarea" Clicked="OnGuardarClicked" Margin="0,8,0,24"
+                    BackgroundColor="#E67514" TextColor="#212121" FontAttributes="Bold" CornerRadius="24" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

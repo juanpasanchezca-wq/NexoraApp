@@ -29,6 +29,8 @@ namespace NexoraApp
             // Rutas de las páginas de detalle (maestro - detalle)
             Routing.RegisterRoute(nameof(ProyectoDetailPage), typeof(ProyectoDetailPage));
             Routing.RegisterRoute(nameof(TareaDetailPage), typeof(TareaDetailPage));
+            Routing.RegisterRoute(nameof(ProyectoFormPage), typeof(ProyectoFormPage));
+            Routing.RegisterRoute(nameof(TareaFormPage), typeof(TareaFormPage));
 
             return builder.Build();
         }

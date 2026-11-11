@@ -79,6 +79,11 @@
         ContentTemplate="{DataTemplate views:AboutPage}"
         Route="AboutPage" />
 
+    <!-- Demostración de los estados vacío y error -->
+    <MenuItem
+        Text="Probar estados (vacío / error)"
+        Clicked="Demo_Clicked" />
+
     <!-- Menú que abre una página web -->
     <MenuItem
         Text="Documentación de .NET MAUI"
