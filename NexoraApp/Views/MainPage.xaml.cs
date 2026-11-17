@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Maui.Controls.Shapes;
 using NexoraApp.DataAccess;
 using NexoraApp.Drawables;
+using NexoraApp.Helpers;
 
 namespace NexoraApp.Views
 {
@@ -33,6 +34,13 @@ namespace NexoraApp.Views
             saludoLabel.Text = $"Hola, {usuario.Nombre.Split(' ')[0]}";
             inicialesLabel.Text = string.Concat(
                 usuario.Nombre.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(p => p[0]));
+
+            // ---------- Campana ----------
+            int sinLeer = Ajustes.NotificacionesActivas
+                ? dbContext.Notificaciones.Count(n => n.UsuarioId == Sesion.UsuarioActualId && !n.Leida)
+                : 0;
+            campanaBadge.IsVisible = sinLeer > 0;
+            campanaLabel.Text = sinLeer > 9 ? "9+" : sinLeer.ToString();
 
             // ---------- Tarjetas de resumen ----------
             var tareas = dbContext.Tareas.Include(t => t.Proyecto).ToList();
@@ -159,6 +167,26 @@ namespace NexoraApp.Views
             "Baja" => Color.FromArgb("#D3ECCD"),
             _ => Color.FromArgb("#E0E0E0")
         };
+
+        private async void OnCampanaTapped(object? sender, TappedEventArgs e)
+        {
+            await Shell.Current.GoToAsync(nameof(NotificacionesPage));
+        }
+
+        private async void OnPerfilTapped(object? sender, TappedEventArgs e)
+        {
+            await Shell.Current.GoToAsync("//PerfilPage");
+        }
+
+        private async void OnNuevaTareaTapped(object? sender, TappedEventArgs e)
+        {
+            await Shell.Current.GoToAsync(nameof(TareaFormPage));
+        }
+
+        private async void OnVerTareasTapped(object? sender, TappedEventArgs e)
+        {
+            await Shell.Current.GoToAsync("//TareasPage");
+        }
 
         private async void OnVerTodosTapped(object? sender, TappedEventArgs e)
         {

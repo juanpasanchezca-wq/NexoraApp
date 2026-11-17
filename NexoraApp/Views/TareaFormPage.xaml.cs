@@ -33,7 +33,16 @@ namespace NexoraApp.Views
         // Modo edición: carga los datos de la tarea
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
-            if (!query.ContainsKey("id")) return;
+            // Creación desde un proyecto: se preselecciona ese proyecto
+            if (!query.ContainsKey("id"))
+            {
+                if (query.TryGetValue("proyectoId", out var pid)
+                    && int.TryParse(pid?.ToString(), out int proyectoPreseleccionado))
+                {
+                    proyectoPicker.SelectedItem = proyectos.FirstOrDefault(p => p.Id == proyectoPreseleccionado);
+                }
+                return;
+            }
 
             tareaId = int.Parse(query["id"].ToString()!);
             Title = "Editar tarea";

@@ -9,9 +9,12 @@
         <VerticalStackLayout Padding="16" Spacing="16">
 
             <!-- Saludo -->
-            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
                 <Border WidthRequest="48" HeightRequest="48" StrokeShape="Ellipse" StrokeThickness="0"
                         BackgroundColor="{StaticResource FondoSuave}">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnPerfilTapped" />
+                    </Border.GestureRecognizers>
                     <Label x:Name="inicialesLabel" FontAttributes="Bold" TextColor="{StaticResource Texto}"
                            HorizontalOptions="Center" VerticalOptions="Center" />
                 </Border>
@@ -19,11 +22,37 @@
                     <Label x:Name="fechaLabel" FontSize="12" Opacity="0.7" />
                     <Label x:Name="saludoLabel" FontSize="22" FontAttributes="Bold" />
                 </VerticalStackLayout>
+
+                <!-- Campana con contador de notificaciones sin leer -->
+                <Grid Grid.Column="2" WidthRequest="44" HeightRequest="44" VerticalOptions="Center">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnCampanaTapped" />
+                    </Grid.GestureRecognizers>
+                    <Image Source="icono_campana_gris.svg" WidthRequest="26" HeightRequest="26"
+                           HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Border x:Name="campanaBadge" IsVisible="False" HorizontalOptions="End" VerticalOptions="Start"
+                            StrokeShape="RoundRectangle 9" StrokeThickness="0" Padding="5,1"
+                            BackgroundColor="{StaticResource Primary}" MinimumWidthRequest="18">
+                        <Label x:Name="campanaLabel" FontSize="11" FontAttributes="Bold"
+                               TextColor="{StaticResource Texto}" HorizontalOptions="Center" />
+                    </Border>
+                </Grid>
             </Grid>
+
+            <!-- Acción rápida -->
+            <Border StrokeShape="RoundRectangle 14" StrokeThickness="0" Padding="14,12"
+                    BackgroundColor="{StaticResource Primary}">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnNuevaTareaTapped" />
+                </Border.GestureRecognizers>
+                <Label Text="+  Nueva tarea" FontAttributes="Bold" TextColor="{StaticResource Texto}"
+                       HorizontalOptions="Center" />
+            </Border>
 
             <!-- Tarjetas de resumen -->
             <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
                 <Border Grid.Column="0" StrokeShape="RoundRectangle 16" Padding="12">
+                    <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnVerTodosTapped" /></Border.GestureRecognizers>
                     <VerticalStackLayout Spacing="6">
                         <Border WidthRequest="36" HeightRequest="36" StrokeShape="Ellipse" StrokeThickness="0"
                                 BackgroundColor="{StaticResource FondoSuave}" HorizontalOptions="Start">
@@ -35,6 +64,7 @@
                 </Border>
 
                 <Border Grid.Column="1" StrokeShape="RoundRectangle 16" Padding="12">
+                    <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnVerTareasTapped" /></Border.GestureRecognizers>
                     <VerticalStackLayout Spacing="6">
                         <Border WidthRequest="36" HeightRequest="36" StrokeShape="Ellipse" StrokeThickness="0"
                                 BackgroundColor="{StaticResource Exito}" HorizontalOptions="Start">
@@ -46,6 +76,7 @@
                 </Border>
 
                 <Border Grid.Column="2" StrokeShape="RoundRectangle 16" Padding="12">
+                    <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnVerTareasTapped" /></Border.GestureRecognizers>
                     <VerticalStackLayout Spacing="6">
                         <Border WidthRequest="36" HeightRequest="36" StrokeShape="Ellipse" StrokeThickness="0"
                                 BackgroundColor="{StaticResource Primary}" HorizontalOptions="Start">

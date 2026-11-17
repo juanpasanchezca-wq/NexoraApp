@@ -32,7 +32,11 @@
                 <VerticalStackLayout Spacing="10">
                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
                         <Image Source="icono_carpeta.svg" WidthRequest="18" HeightRequest="18" />
-                        <Label x:Name="proyectoLabel" Grid.Column="1" />
+                        <Label x:Name="proyectoLabel" Grid.Column="1" TextDecorations="Underline">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnProyectoTapped" />
+                            </Label.GestureRecognizers>
+                        </Label>
                     </Grid>
                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
                         <Border x:Name="avatar" WidthRequest="26" HeightRequest="26" StrokeShape="Ellipse" StrokeThickness="0">

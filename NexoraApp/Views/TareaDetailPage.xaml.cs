@@ -10,6 +10,7 @@ namespace NexoraApp.Views
         private static readonly string[] Estados = { "Por hacer", "En progreso", "En revisión", "Hecha" };
 
         private int tareaId;
+        private int proyectoId;
         private readonly SelectorOpciones selectorEstado;
 
         public TareaDetailPage()
@@ -45,6 +46,7 @@ namespace NexoraApp.Views
             estadoChip.BackgroundColor = Estilos.ColorEstadoTarea(tarea.Estado);
             prioridadLabel.Text = $"Prioridad {tarea.Prioridad.ToLower()}";
             prioridadChip.BackgroundColor = Estilos.FondoPrioridad(tarea.Prioridad);
+            proyectoId = tarea.ProyectoId;
             proyectoLabel.Text = tarea.Proyecto.Nombre;
             responsableLabel.Text = tarea.Usuario.Nombre;
             inicialesLabel.Text = Estilos.Iniciales(tarea.Usuario.Nombre);
@@ -150,6 +152,13 @@ namespace NexoraApp.Views
 
             comentarioEntry.Text = "";
             CargarComentarios(dbContext);
+        }
+
+        // Del detalle de la tarea se pasa al detalle de su proyecto
+        private async void OnProyectoTapped(object? sender, TappedEventArgs e)
+        {
+            if (proyectoId == 0) return;
+            await Shell.Current.GoToAsync($"{nameof(ProyectoDetailPage)}?id={proyectoId}");
         }
 
         // ---------- Editar y eliminar ----------

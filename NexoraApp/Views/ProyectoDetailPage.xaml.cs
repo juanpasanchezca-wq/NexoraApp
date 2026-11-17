@@ -125,6 +125,11 @@ namespace NexoraApp.Views
         }
 
         // ---------- Editar y eliminar ----------
+        private async void OnNuevaTareaTapped(object? sender, TappedEventArgs e)
+        {
+            await Shell.Current.GoToAsync($"{nameof(TareaFormPage)}?proyectoId={proyectoId}");
+        }
+
         private async void OnEditarClicked(object? sender, EventArgs e)
         {
             await Shell.Current.GoToAsync($"{nameof(ProyectoFormPage)}?id={proyectoId}");

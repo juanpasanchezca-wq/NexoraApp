@@ -118,6 +118,14 @@
 
             <!-- Pestaña 2: Tareas -->
             <VerticalStackLayout x:Name="panelTareas" Spacing="10" IsVisible="False">
+                <Border StrokeShape="RoundRectangle 14" StrokeThickness="0" Padding="12"
+                        BackgroundColor="{StaticResource Primary}">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnNuevaTareaTapped" />
+                    </Border.GestureRecognizers>
+                    <Label Text="+  Nueva tarea en este proyecto" FontAttributes="Bold"
+                           TextColor="{StaticResource Texto}" HorizontalOptions="Center" />
+                </Border>
                 <Label x:Name="sinTareasLabel" Text="Este proyecto aún no tiene tareas." IsVisible="False" Opacity="0.7" HorizontalOptions="Center" Margin="0,20" />
                 <VerticalStackLayout x:Name="listaTareas" Spacing="10">
                     <BindableLayout.ItemTemplate>
