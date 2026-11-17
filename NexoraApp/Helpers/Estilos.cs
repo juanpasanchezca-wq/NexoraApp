@@ -54,6 +54,30 @@ namespace NexoraApp.Helpers
         public static Color ColorVencimiento(DateTime fecha, string estado) =>
             estado != "Hecha" && fecha.Date < DateTime.Today ? Color.FromArgb("#D32F2F") : Gris;
 
+        public static Color FondoRol(string rol) => rol switch
+        {
+            "Administrador" => Color.FromArgb("#33E67514"),
+            "Líder de proyecto" => Color.FromArgb("#3306923E"),
+            _ => Color.FromArgb("#33808080"),
+        };
+
+        public static Color ColorTipoNotificacion(string tipo) => tipo switch
+        {
+            "Vencida" => Color.FromArgb("#D32F2F"),
+            "Comentario" => Primario,
+            _ => Exito,
+        };
+
+        public static string TextoCuando(DateTime fecha)
+        {
+            var d = DateTime.Now - fecha;
+            if (d.TotalMinutes < 1) return "Ahora";
+            if (d.TotalHours < 1) return $"Hace {(int)d.TotalMinutes} min";
+            if (d.TotalHours < 24) return $"Hace {(int)d.TotalHours} h";
+            if (d.TotalHours < 48) return "Ayer";
+            return fecha.ToString("dd/MM");
+        }
+
         public static string TextoVencimiento(DateTime fecha, string estado)
         {
             if (estado == "Hecha") return $"Entregada";
