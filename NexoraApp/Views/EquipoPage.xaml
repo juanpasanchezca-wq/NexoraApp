@@ -1,12 +1,62 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:views="clr-namespace:NexoraApp.Views"
+             xmlns:comp="clr-namespace:NexoraApp.Views.Componentes"
              x:Class="NexoraApp.Views.EquipoPage"
              Title="Equipo">
 
     <ScrollView>
-        <VerticalStackLayout x:Name="container" Padding="16" Spacing="10">
+        <VerticalStackLayout Padding="16" Spacing="14">
+
+            <Label x:Name="resumenLabel" FontSize="14" Opacity="0.75" />
+
+            <!-- Filtros por rol (se dibujan en el código) -->
+            <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                <HorizontalStackLayout x:Name="chips" Spacing="8" />
+            </ScrollView>
+
+            <comp:EstadoVista x:Name="estadoVista" IsVisible="False" />
+
+            <!-- Tarjetas de personas -->
+            <VerticalStackLayout x:Name="lista" Spacing="12">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="views:MiembroEquipo">
+                        <Border StrokeShape="RoundRectangle 16" Padding="14">
+                            <VerticalStackLayout Spacing="12">
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                                    <Border WidthRequest="48" HeightRequest="48" StrokeShape="Ellipse" StrokeThickness="0"
+                                            BackgroundColor="{Binding Fondo}" VerticalOptions="Start">
+                                        <Label Text="{Binding Iniciales}" FontAttributes="Bold" TextColor="#212121"
+                                               HorizontalOptions="Center" VerticalOptions="Center" />
+                                    </Border>
+                                    <VerticalStackLayout Grid.Column="1" Spacing="3">
+                                        <Label Text="{Binding Nombre}" FontSize="16" FontAttributes="Bold" />
+                                        <Border StrokeShape="RoundRectangle 10" StrokeThickness="0" Padding="8,2"
+                                                BackgroundColor="{Binding FondoRol}" HorizontalOptions="Start">
+                                            <Label Text="{Binding Rol}" FontSize="11" FontAttributes="Bold" />
+                                        </Border>
+                                        <HorizontalStackLayout Spacing="6">
+                                            <Image Source="icono_correo_gris.svg" WidthRequest="14" HeightRequest="14" />
+                                            <Label Text="{Binding Correo}" FontSize="12" Opacity="0.75" />
+                                        </HorizontalStackLayout>
+                                    </VerticalStackLayout>
+                                </Grid>
+
+                                <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                                    <Label Text="{Binding Proyectos}" FontSize="12" Opacity="0.8" />
+                                    <Label Grid.Column="1" Text="{Binding Pendientes}" FontSize="12" Opacity="0.8" />
+                                </Grid>
+
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                    <ProgressBar Progress="{Binding Avance}" ProgressColor="#E67514" VerticalOptions="Center" />
+                                    <Label Grid.Column="1" Text="{Binding AvanceTexto}" FontSize="12" FontAttributes="Bold" />
+                                </Grid>
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
         </VerticalStackLayout>
     </ScrollView>
-
 </ContentPage>

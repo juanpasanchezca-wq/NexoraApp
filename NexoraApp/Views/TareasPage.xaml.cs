@@ -11,6 +11,8 @@ namespace NexoraApp.Views
         private static readonly string[] Filtros = { "Todas", "Mis tareas", "Prioridad alta", "Vencidas" };
 
         private bool verKanban;
+        private bool hayDatos = true;
+        private bool primeraCarga = true;
         private string filtro = "Todas";
 
         public TareasPage()
@@ -18,20 +20,87 @@ namespace NexoraApp.Views
             InitializeComponent();
         }
 
-        protected override void OnAppearing()
+        protected override async void OnAppearing()
         {
             base.OnAppearing();
+
+            // Estado "cargando": la primera vez se muestra el esqueleto un instante
+            // (los datos están en memoria, así que la espera es solo ilustrativa)
+            if (primeraCarga)
+            {
+                primeraCarga = false;
+                MostrarCargando();
+                await Task.Delay(700);
+            }
             Cargar();
+        }
+
+        private void MostrarCargando()
+        {
+            selectorVista.IsVisible = false;
+            chips.IsVisible = false;
+            hayDatos = false;
+            MostrarVista();
+            estadoVista.IsVisible = false;
+            skeleton.IsVisible = true;
+            skeleton.Iniciar();
+        }
+
+        private void OcultarCargando()
+        {
+            skeleton.Detener();
+            skeleton.IsVisible = false;
+        }
+
+        // Estado "error": no se pudo leer la base de datos
+        private void MostrarError()
+        {
+            OcultarCargando();
+            selectorVista.IsVisible = false;
+            chips.IsVisible = false;
+            hayDatos = false;
+            MostrarVista();
+            estadoVista.Mostrar("icono_error.svg", Color.FromArgb("#D32F2F"),
+                "No se pudieron cargar las tareas",
+                "Ocurrió un problema al leer los datos. Inténtalo de nuevo.",
+                "Reintentar", async () =>
+                {
+                    MostrarCargando();
+                    await Task.Delay(500);
+                    Cargar();
+                });
         }
 
         private void Cargar()
         {
+            try
+            {
+                CargarDatos();
+            }
+            catch (Exception)
+            {
+                MostrarError();
+            }
+        }
+
+        private void CargarDatos()
+        {
+            if (Sesion.DemoEstado == 2)
+                throw new InvalidOperationException("Error simulado");
+
             var dbContext = new NexoraDbContext();
-            var tareas = dbContext.Tareas
-                .Include(t => t.Proyecto)
-                .Include(t => t.Usuario)
-                .OrderBy(t => t.FechaLimite)
-                .ToList();
+            var tareas = Sesion.DemoEstado == 1
+                ? new List<Tarea>()
+                : dbContext.Tareas
+                    .Include(t => t.Proyecto)
+                    .Include(t => t.Usuario)
+                    .OrderBy(t => t.FechaLimite)
+                    .ToList();
+
+            OcultarCargando();
+            estadoVista.IsVisible = false;
+            selectorVista.IsVisible = tareas.Count > 0;
+            chips.IsVisible = tareas.Count > 0;
 
             // ---------- Filtros con contador ----------
             chips.Children.Clear();
@@ -88,7 +157,27 @@ namespace NexoraApp.Views
 
             BindableLayout.SetItemsSource(panelLista, grupos);
             BindableLayout.SetItemsSource(kanbanColumnas, grupos);
-            vacioLabel.IsVisible = filtradas.Count == 0;
+
+            // ---------- Estado vacío ----------
+            hayDatos = filtradas.Count > 0;
+            if (tareas.Count == 0)
+            {
+                estadoVista.Mostrar("icono_tareas_vacia.svg", Estilos.Primario,
+                    "Aún no tienes tareas",
+                    "Crea una tarea y asígnala a alguien de tu equipo.",
+                    "Nueva tarea", async () => await Shell.Current.GoToAsync(nameof(TareaFormPage)));
+            }
+            else if (filtradas.Count == 0)
+            {
+                estadoVista.Mostrar("icono_buscar_naranja.svg", Estilos.Primario,
+                    $"No hay tareas en \"{filtro}\"",
+                    "Prueba con otro filtro para ver más tareas.",
+                    "Ver todas", () =>
+                    {
+                        filtro = "Todas";
+                        Cargar();
+                    });
+            }
             MostrarVista();
         }
 
@@ -103,8 +192,8 @@ namespace NexoraApp.Views
         // ---------- Lista / Kanban ----------
         private void MostrarVista()
         {
-            panelLista.IsVisible = !verKanban;
-            panelKanban.IsVisible = verKanban;
+            panelLista.IsVisible = hayDatos && !verKanban;
+            panelKanban.IsVisible = hayDatos && verKanban;
 
             vistaLista.BackgroundColor = !verKanban ? Estilos.Primario : Color.FromArgb("#33808080");
             vistaKanban.BackgroundColor = verKanban ? Estilos.Primario : Color.FromArgb("#33808080");

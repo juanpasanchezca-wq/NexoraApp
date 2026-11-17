@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NexoraApp.Views.ProyectoFormPage"
+             Title="Nuevo proyecto">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Guardar" Order="Primary" Clicked="OnGuardarClicked" />
+    </ContentPage.ToolbarItems>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+
+            <Label Text="Nombre del proyecto" FontAttributes="Bold" />
+            <Entry x:Name="nombreEntry" Placeholder="Ej. Rediseño del sitio web" />
+
+            <Label Text="Descripción" FontAttributes="Bold" />
+            <Editor x:Name="descripcionEditor" Placeholder="¿De qué trata el proyecto?" HeightRequest="110" AutoSize="Disabled" />
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                <VerticalStackLayout Grid.Column="0" Spacing="4">
+                    <Label Text="Fecha de inicio" FontAttributes="Bold" />
+                    <DatePicker x:Name="inicioPicker" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="1" Spacing="4">
+                    <Label Text="Fecha de entrega" FontAttributes="Bold" />
+                    <DatePicker x:Name="finPicker" />
+                </VerticalStackLayout>
+            </Grid>
+
+            <Label Text="Estado" FontAttributes="Bold" />
+            <Grid x:Name="estadoGrid" ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="8" />
+
+            <Label Text="Responsable" FontAttributes="Bold" />
+            <Picker x:Name="responsablePicker" Title="Selecciona al responsable" ItemDisplayBinding="{Binding Nombre}" />
+
+            <Label Text="Miembros del equipo" FontAttributes="Bold" />
+            <VerticalStackLayout x:Name="miembrosLayout" Spacing="2" />
+
+            <Label x:Name="errorLabel" TextColor="#D32F2F" IsVisible="False" />
+
+            <Button Text="Guardar proyecto" Clicked="OnGuardarClicked" Margin="0,8,0,24"
+                    BackgroundColor="#E67514" TextColor="#212121" FontAttributes="Bold" CornerRadius="24" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

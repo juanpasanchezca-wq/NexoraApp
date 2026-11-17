@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:handlers="clr-namespace:NexoraApp.Handlers"
              xmlns:views="clr-namespace:NexoraApp.Views"
+             xmlns:comp="clr-namespace:NexoraApp.Views.Componentes"
              x:Class="NexoraApp.Views.TareasPage"
              Title="Tareas">
 
@@ -50,7 +51,7 @@
             <VerticalStackLayout Padding="16,16,16,96" Spacing="14">
 
                 <!-- Lista / Kanban -->
-                <Grid ColumnDefinitions="*,*" ColumnSpacing="6">
+                <Grid x:Name="selectorVista" ColumnDefinitions="*,*" ColumnSpacing="6">
                     <Border x:Name="vistaLista" Grid.Column="0" StrokeShape="RoundRectangle 18" StrokeThickness="0" Padding="0,10">
                         <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnVistaListaTapped" /></Border.GestureRecognizers>
                         <Label x:Name="vistaListaLabel" Text="Lista" HorizontalOptions="Center" />
@@ -110,8 +111,9 @@
                     </HorizontalStackLayout>
                 </ScrollView>
 
-                <Label x:Name="vacioLabel" Text="No hay tareas con este filtro." IsVisible="False"
-                       HorizontalOptions="Center" Margin="0,30,0,0" Opacity="0.7" />
+                <!-- Estados: cargando, vacío y error -->
+                <comp:SkeletonLista x:Name="skeleton" IsVisible="False" />
+                <comp:EstadoVista x:Name="estadoVista" IsVisible="False" />
             </VerticalStackLayout>
         </ScrollView>
 

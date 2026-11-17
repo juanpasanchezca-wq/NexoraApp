@@ -34,4 +34,15 @@ namespace NexoraApp.Views
     }
 
     public record ComentarioItem(string Iniciales, Color Fondo, string Autor, string Texto, string Fecha);
+
+    // Pantalla Equipo
+    public record MiembroEquipo(
+        int Id, string Nombre, string Correo, string Rol, string Iniciales,
+        Color Fondo, Color FondoRol, string Proyectos, string Pendientes,
+        double Avance, string AvanceTexto);
+
+    // Pantalla Notificaciones
+    public record NotificacionItem(
+        int Id, int? TareaId, string Titulo, string Mensaje, string Cuando,
+        bool NoLeida, Color ColorTipo, Color Fondo);
 }
