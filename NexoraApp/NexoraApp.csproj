@@ -71,4 +71,13 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.12" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <MauiXaml Update="Views\Componentes\EstadoVista.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Componentes\SkeletonLista.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	</ItemGroup>
+
 </Project>
