@@ -31,6 +31,7 @@ namespace NexoraApp
             Routing.RegisterRoute(nameof(TareaDetailPage), typeof(TareaDetailPage));
             Routing.RegisterRoute(nameof(ProyectoFormPage), typeof(ProyectoFormPage));
             Routing.RegisterRoute(nameof(TareaFormPage), typeof(TareaFormPage));
+            Routing.RegisterRoute(nameof(NotificacionesPage), typeof(NotificacionesPage));
 
             return builder.Build();
         }
