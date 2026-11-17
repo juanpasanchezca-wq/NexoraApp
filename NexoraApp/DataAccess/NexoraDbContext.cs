@@ -10,6 +10,7 @@ namespace NexoraApp.DataAccess
         public DbSet<Miembro> Miembros { get; set; } = null!;
         public DbSet<Subtarea> Subtareas { get; set; } = null!;
         public DbSet<Comentario> Comentarios { get; set; } = null!;
+        public DbSet<Notificacion> Notificaciones { get; set; } = null!;
 
         // Las fechas de las tareas se calculan desde hoy, así el resumen
         // (tareas de hoy, vencidas, completadas de la semana) siempre tiene datos.
@@ -65,6 +66,14 @@ namespace NexoraApp.DataAccess
                 new Comentario(3, 8, 6, "La pasarela responde bien en el entorno de pruebas.", Hoy.AddDays(-1).AddHours(15))
             );
 
+            modelBuilder.Entity<Notificacion>().HasData(
+                new Notificacion(1, 1, "Tarea vencida", "Revisar presupuesto del proyecto venció ayer.", Hoy.AddHours(8), false, 2, "Vencida"),
+                new Notificacion(2, 1, "Tarea vencida", "Plan de respaldo de datos venció hace 4 días.", Hoy.AddHours(7), false, 6, "Vencida"),
+                new Notificacion(3, 1, "Nuevo comentario", "Sofía Torres comentó en Diseñar maqueta de inicio.", Hoy.AddHours(9), false, 7, "Comentario"),
+                new Notificacion(4, 1, "Tarea asignada", "Te asignaron Guía de estilos de marca.", Hoy.AddDays(-1).AddHours(16), true, 10, "Asignada"),
+                new Notificacion(5, 1, "Nuevo comentario", "Andrés Castillo comentó en Integrar pasarela de pago.", Hoy.AddDays(-2).AddHours(11), true, 8, "Comentario")
+            );
+
             modelBuilder.Entity<Tarea>().HasData(
                 new Tarea(1, "Redactar textos de la página \"Nosotros\"", "Escribir los textos de misión, visión y equipo.", "Media", "Por hacer", Dia(3), 1, 3),
                 new Tarea(2, "Revisar presupuesto del proyecto", "Validar el presupuesto con finanzas antes de la siguiente fase.", "Alta", "Por hacer", Dia(-1), 1, 1),
@@ -110,4 +119,7 @@ namespace NexoraApp.DataAccess
     {
         public Usuario Usuario { get; set; } = null!;
     }
+
+    // Avisos para el usuario: tareas vencidas, comentarios y asignaciones
+    public record Notificacion(int Id, int UsuarioId, string Titulo, string Mensaje, DateTime Fecha, bool Leida, int? TareaId, string Tipo);
 }
