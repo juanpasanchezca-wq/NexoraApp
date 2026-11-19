@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using NexoraApp.DataAccess;
@@ -9,162 +11,48 @@ namespace NexoraApp.Views
     {
         private static readonly string[] Estados = { "Por hacer", "En progreso", "En revisión", "Hecha" };
 
-        private int tareaId;
-        private int proyectoId;
+        private readonly TareaDetailData datos;
         private readonly SelectorOpciones selectorEstado;
 
         public TareaDetailPage()
         {
             InitializeComponent();
-            selectorEstado = new SelectorOpciones(estadoGrid, Estados, 2, CambiarEstado);
+
+            // La vista queda enlazada al modelo (Clase 8): todo lo que se ve sale de "datos"
+            datos = new TareaDetailData();
+            BindingContext = datos;
+
+            selectorEstado = new SelectorOpciones(estadoGrid, Estados, 2, nuevo => datos.CambiarEstado(nuevo));
         }
 
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
-            tareaId = int.Parse(query["id"].ToString()!);
+            datos.TareaId = int.Parse(query["id"].ToString()!);
         }
 
         // Se recarga al volver del formulario de edición
         protected override void OnAppearing()
         {
             base.OnAppearing();
-            Cargar();
+            datos.Cargar();
+            selectorEstado.Seleccionar(datos.Estado);
         }
 
-        private void Cargar()
-        {
-            var dbContext = new NexoraDbContext();
-            var tarea = dbContext.Tareas
-                .Include(t => t.Proyecto)
-                .Include(t => t.Usuario)
-                .FirstOrDefault(t => t.Id == tareaId);
-            if (tarea == null) return;
+        private void OnAgregarSubtarea(object? sender, EventArgs e) => datos.AgregarSubtarea();
 
-            tituloLabel.Text = tarea.Titulo;
-            descripcionLabel.Text = tarea.Descripcion;
-            estadoLabel.Text = tarea.Estado;
-            estadoChip.BackgroundColor = Estilos.ColorEstadoTarea(tarea.Estado);
-            prioridadLabel.Text = $"Prioridad {tarea.Prioridad.ToLower()}";
-            prioridadChip.BackgroundColor = Estilos.FondoPrioridad(tarea.Prioridad);
-            proyectoId = tarea.ProyectoId;
-            proyectoLabel.Text = tarea.Proyecto.Nombre;
-            responsableLabel.Text = tarea.Usuario.Nombre;
-            inicialesLabel.Text = Estilos.Iniciales(tarea.Usuario.Nombre);
-            avatar.BackgroundColor = Estilos.ColorAvatar(tarea.UsuarioId);
-            fechaLabel.Text = $"{tarea.FechaLimite:dd/MM/yyyy}  ·  {Estilos.TextoVencimiento(tarea.FechaLimite, tarea.Estado)}";
-            selectorEstado.Seleccionar(tarea.Estado);
-
-            CargarSubtareas(dbContext);
-            CargarComentarios(dbContext);
-        }
-
-        // ---------- Estado ----------
-        private void CambiarEstado(string nuevo)
-        {
-            var dbContext = new NexoraDbContext();
-            var tarea = dbContext.Tareas.First(t => t.Id == tareaId);
-            dbContext.Entry(tarea).Property(t => t.Estado).CurrentValue = nuevo;
-            tarea.FechaCompletada = nuevo == "Hecha" ? DateTime.Now : null;
-            dbContext.SaveChanges();
-            Cargar();
-        }
-
-        // ---------- Subtareas ----------
-        private void CargarSubtareas(NexoraDbContext dbContext)
-        {
-            var subtareas = dbContext.Subtareas.Where(s => s.TareaId == tareaId).OrderBy(s => s.Id).ToList();
-            var hechas = subtareas.Count(s => s.Completada);
-            subtareasContador.Text = $"{hechas}/{subtareas.Count}";
-            subtareasBarra.Progress = subtareas.Count == 0 ? 0 : (double)hechas / subtareas.Count;
-
-            subtareasLayout.Children.Clear();
-            foreach (var s in subtareas)
-            {
-                var check = new CheckBox { IsChecked = s.Completada, Color = Estilos.Primario, VerticalOptions = LayoutOptions.Center };
-                var etiqueta = new Label
-                {
-                    Text = s.Titulo,
-                    VerticalOptions = LayoutOptions.Center,
-                    TextDecorations = s.Completada ? TextDecorations.Strikethrough : TextDecorations.None,
-                    Opacity = s.Completada ? 0.6 : 1
-                };
-                var id = s.Id;
-                check.CheckedChanged += (sender, e) => MarcarSubtarea(id, e.Value);
-
-                var fila = new HorizontalStackLayout { Spacing = 6 };
-                fila.Children.Add(check);
-                fila.Children.Add(etiqueta);
-                subtareasLayout.Children.Add(fila);
-            }
-        }
-
-        private void MarcarSubtarea(int id, bool completada)
-        {
-            var dbContext = new NexoraDbContext();
-            var subtarea = dbContext.Subtareas.First(s => s.Id == id);
-            dbContext.Entry(subtarea).Property(s => s.Completada).CurrentValue = completada;
-            dbContext.SaveChanges();
-            CargarSubtareas(dbContext);
-        }
-
-        private void OnAgregarSubtarea(object? sender, EventArgs e)
-        {
-            var texto = subtareaEntry.Text?.Trim() ?? "";
-            if (texto.Length == 0) return;
-
-            var dbContext = new NexoraDbContext();
-            var id = (dbContext.Subtareas.Any() ? dbContext.Subtareas.Max(s => s.Id) : 0) + 1;
-            dbContext.Subtareas.Add(new Subtarea(id, tareaId, texto, false));
-            dbContext.SaveChanges();
-
-            subtareaEntry.Text = "";
-            CargarSubtareas(dbContext);
-        }
-
-        // ---------- Comentarios ----------
-        private void CargarComentarios(NexoraDbContext dbContext)
-        {
-            var cultura = new CultureInfo("es-ES");
-            var comentarios = dbContext.Comentarios
-                .Include(c => c.Usuario)
-                .Where(c => c.TareaId == tareaId)
-                .OrderBy(c => c.Fecha)
-                .ToList();
-
-            comentariosTitulo.Text = $"Comentarios ({comentarios.Count})";
-            var items = comentarios
-                .Select(c => new ComentarioItem(
-                    Estilos.Iniciales(c.Usuario.Nombre), Estilos.ColorAvatar(c.UsuarioId),
-                    c.Usuario.Nombre, c.Texto, c.Fecha.ToString("d MMM, HH:mm", cultura)))
-                .ToList();
-            BindableLayout.SetItemsSource(listaComentarios, items);
-        }
-
-        private void OnEnviarComentario(object? sender, EventArgs e)
-        {
-            var texto = comentarioEntry.Text?.Trim() ?? "";
-            if (texto.Length == 0) return;
-
-            var dbContext = new NexoraDbContext();
-            var id = (dbContext.Comentarios.Any() ? dbContext.Comentarios.Max(c => c.Id) : 0) + 1;
-            dbContext.Comentarios.Add(new Comentario(id, tareaId, Sesion.UsuarioActualId, texto, DateTime.Now));
-            dbContext.SaveChanges();
-
-            comentarioEntry.Text = "";
-            CargarComentarios(dbContext);
-        }
+        private void OnEnviarComentario(object? sender, EventArgs e) => datos.EnviarComentario();
 
         // Del detalle de la tarea se pasa al detalle de su proyecto
         private async void OnProyectoTapped(object? sender, TappedEventArgs e)
         {
-            if (proyectoId == 0) return;
-            await Shell.Current.GoToAsync($"{nameof(ProyectoDetailPage)}?id={proyectoId}");
+            if (datos.ProyectoId == 0) return;
+            await Shell.Current.GoToAsync($"{nameof(ProyectoDetailPage)}?id={datos.ProyectoId}");
         }
 
         // ---------- Editar y eliminar ----------
         private async void OnEditarClicked(object? sender, EventArgs e)
         {
-            await Shell.Current.GoToAsync($"{nameof(TareaFormPage)}?id={tareaId}");
+            await Shell.Current.GoToAsync($"{nameof(TareaFormPage)}?id={datos.TareaId}");
         }
 
         private async void OnEliminarClicked(object? sender, EventArgs e)
@@ -174,14 +62,213 @@ namespace NexoraApp.Views
                 "Eliminar", "Cancelar");
             if (!confirmar) return;
 
+            datos.Eliminar();
+            await Shell.Current.GoToAsync("..");
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // Modelo de la vista (Clase 8): propiedades con notificación + colecciones observables
+    // ------------------------------------------------------------------
+    public class SubtareaItem : BindingUtilObject
+    {
+        private bool completada;
+
+        public SubtareaItem(int id, string titulo, bool completada)
+        {
+            Id = id;
+            Titulo = titulo;
+            this.completada = completada;
+        }
+
+        public int Id { get; }
+        public string Titulo { get; }
+
+        // El CheckBox la modifica (TwoWay) y el modelo se entera por PropertyChanged
+        public bool Completada
+        {
+            get => completada;
+            set => SetProperty(ref completada, value);
+        }
+    }
+
+    public class TareaDetailData : BindingUtilObject
+    {
+        private string titulo = "";
+        private string descripcion = "";
+        private string estado = "";
+        private string prioridad = "";
+        private string proyecto = "";
+        private string responsable = "";
+        private string iniciales = "";
+        private Color avatarColor = Colors.Gray;
+        private string fechaTexto = "";
+        private string subtareasContador = "0/0";
+        private double subtareasProgreso;
+        private string nuevaSubtarea = "";
+        private string nuevoComentario = "";
+        private bool cargando;
+
+        public int TareaId { get; set; }
+        public int ProyectoId { get; private set; }
+
+        public string Titulo { get => titulo; set => SetProperty(ref titulo, value); }
+        public string Descripcion { get => descripcion; set => SetProperty(ref descripcion, value); }
+        public string Estado { get => estado; set => SetProperty(ref estado, value); }
+
+        public string Prioridad
+        {
+            get => prioridad;
+            set
+            {
+                if (SetProperty(ref prioridad, value)) OnPropertyChanged(nameof(PrioridadTexto));
+            }
+        }
+        public string PrioridadTexto => $"Prioridad {prioridad.ToLower()}";
+
+        public string Proyecto { get => proyecto; set => SetProperty(ref proyecto, value); }
+        public string Responsable { get => responsable; set => SetProperty(ref responsable, value); }
+        public string Iniciales { get => iniciales; set => SetProperty(ref iniciales, value); }
+        public Color AvatarColor { get => avatarColor; set => SetProperty(ref avatarColor, value); }
+        public string FechaTexto { get => fechaTexto; set => SetProperty(ref fechaTexto, value); }
+        public string SubtareasContador { get => subtareasContador; set => SetProperty(ref subtareasContador, value); }
+        public double SubtareasProgreso { get => subtareasProgreso; set => SetProperty(ref subtareasProgreso, value); }
+
+        // Se enlazan en modo TwoWay con los Entry
+        public string NuevaSubtarea { get => nuevaSubtarea; set => SetProperty(ref nuevaSubtarea, value); }
+        public string NuevoComentario { get => nuevoComentario; set => SetProperty(ref nuevoComentario, value); }
+
+        // Las colecciones observables avisan a la vista al agregar o quitar elementos
+        public ObservableCollection<SubtareaItem> Subtareas { get; } = new();
+        public ObservableCollection<ComentarioItem> Comentarios { get; } = new();
+
+        // ---------- Cargar ----------
+        public void Cargar()
+        {
             var dbContext = new NexoraDbContext();
-            dbContext.Subtareas.RemoveRange(dbContext.Subtareas.Where(s => s.TareaId == tareaId));
-            dbContext.Comentarios.RemoveRange(dbContext.Comentarios.Where(c => c.TareaId == tareaId));
-            var tarea = dbContext.Tareas.FirstOrDefault(t => t.Id == tareaId);
-            if (tarea != null) dbContext.Tareas.Remove(tarea);
+            var tarea = dbContext.Tareas
+                .Include(t => t.Proyecto)
+                .Include(t => t.Usuario)
+                .FirstOrDefault(t => t.Id == TareaId);
+            if (tarea == null) return;
+
+            Titulo = tarea.Titulo;
+            Descripcion = tarea.Descripcion;
+            Estado = tarea.Estado;
+            Prioridad = tarea.Prioridad;
+            ProyectoId = tarea.ProyectoId;
+            Proyecto = tarea.Proyecto.Nombre;
+            Responsable = tarea.Usuario.Nombre;
+            Iniciales = Estilos.Iniciales(tarea.Usuario.Nombre);
+            AvatarColor = Estilos.ColorAvatar(tarea.UsuarioId);
+            FechaTexto = $"{tarea.FechaLimite:dd/MM/yyyy}  ·  {Estilos.TextoVencimiento(tarea.FechaLimite, tarea.Estado)}";
+
+            CargarSubtareas(dbContext);
+            CargarComentarios(dbContext);
+        }
+
+        // ---------- Estado ----------
+        public void CambiarEstado(string nuevo)
+        {
+            var dbContext = new NexoraDbContext();
+            var tarea = dbContext.Tareas.First(t => t.Id == TareaId);
+            dbContext.Entry(tarea).Property(t => t.Estado).CurrentValue = nuevo;
+            tarea.FechaCompletada = nuevo == "Hecha" ? DateTime.Now : null;
+            dbContext.SaveChanges();
+            Cargar();
+        }
+
+        // ---------- Subtareas ----------
+        private void CargarSubtareas(NexoraDbContext dbContext)
+        {
+            cargando = true;
+            foreach (var anterior in Subtareas) anterior.PropertyChanged -= OnSubtareaCambio;
+            Subtareas.Clear();
+
+            foreach (var s in dbContext.Subtareas.Where(s => s.TareaId == TareaId).OrderBy(s => s.Id).ToList())
+            {
+                var item = new SubtareaItem(s.Id, s.Titulo, s.Completada);
+                item.PropertyChanged += OnSubtareaCambio;
+                Subtareas.Add(item);
+            }
+            cargando = false;
+            ActualizarProgreso();
+        }
+
+        // Se dispara cuando el usuario marca o desmarca un CheckBox (TwoWay)
+        private void OnSubtareaCambio(object? sender, PropertyChangedEventArgs e)
+        {
+            if (cargando || sender is not SubtareaItem item || e.PropertyName != nameof(SubtareaItem.Completada)) return;
+
+            var dbContext = new NexoraDbContext();
+            var subtarea = dbContext.Subtareas.First(s => s.Id == item.Id);
+            dbContext.Entry(subtarea).Property(s => s.Completada).CurrentValue = item.Completada;
+            dbContext.SaveChanges();
+            ActualizarProgreso();
+        }
+
+        private void ActualizarProgreso()
+        {
+            var hechas = Subtareas.Count(s => s.Completada);
+            SubtareasContador = $"{hechas}/{Subtareas.Count}";
+            SubtareasProgreso = Subtareas.Count == 0 ? 0 : (double)hechas / Subtareas.Count;
+        }
+
+        public void AgregarSubtarea()
+        {
+            var texto = NuevaSubtarea.Trim();
+            if (texto.Length == 0) return;
+
+            var dbContext = new NexoraDbContext();
+            var id = (dbContext.Subtareas.Any() ? dbContext.Subtareas.Max(s => s.Id) : 0) + 1;
+            dbContext.Subtareas.Add(new Subtarea(id, TareaId, texto, false));
             dbContext.SaveChanges();
 
-            await Shell.Current.GoToAsync("..");
+            var item = new SubtareaItem(id, texto, false);
+            item.PropertyChanged += OnSubtareaCambio;
+            Subtareas.Add(item);          // la vista se actualiza sola
+            ActualizarProgreso();
+            NuevaSubtarea = "";           // y el Entry se limpia por el binding
+        }
+
+        // ---------- Comentarios ----------
+        private void CargarComentarios(NexoraDbContext dbContext)
+        {
+            Comentarios.Clear();
+            foreach (var c in dbContext.Comentarios.Include(c => c.Usuario)
+                         .Where(c => c.TareaId == TareaId).OrderBy(c => c.Fecha).ToList())
+                Comentarios.Add(ComoItem(c, c.Usuario.Nombre));
+        }
+
+        private static ComentarioItem ComoItem(Comentario c, string autor) =>
+            new(Estilos.Iniciales(autor), Estilos.ColorAvatar(c.UsuarioId), autor, c.Texto,
+                c.Fecha.ToString("d MMM, HH:mm", new CultureInfo("es-ES")));
+
+        public void EnviarComentario()
+        {
+            var texto = NuevoComentario.Trim();
+            if (texto.Length == 0) return;
+
+            var dbContext = new NexoraDbContext();
+            var id = (dbContext.Comentarios.Any() ? dbContext.Comentarios.Max(c => c.Id) : 0) + 1;
+            var comentario = new Comentario(id, TareaId, Sesion.UsuarioActualId, texto, DateTime.Now);
+            dbContext.Comentarios.Add(comentario);
+            dbContext.SaveChanges();
+
+            var autor = dbContext.Usuarios.First(u => u.Id == Sesion.UsuarioActualId).Nombre;
+            Comentarios.Add(ComoItem(comentario, autor));
+            NuevoComentario = "";
+        }
+
+        // ---------- Eliminar ----------
+        public void Eliminar()
+        {
+            var dbContext = new NexoraDbContext();
+            dbContext.Subtareas.RemoveRange(dbContext.Subtareas.Where(s => s.TareaId == TareaId));
+            dbContext.Comentarios.RemoveRange(dbContext.Comentarios.Where(c => c.TareaId == TareaId));
+            var tarea = dbContext.Tareas.FirstOrDefault(t => t.Id == TareaId);
+            if (tarea != null) dbContext.Tareas.Remove(tarea);
+            dbContext.SaveChanges();
         }
     }
 }

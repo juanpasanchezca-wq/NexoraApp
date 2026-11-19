@@ -2,8 +2,17 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:views="clr-namespace:NexoraApp.Views"
+             xmlns:conv="clr-namespace:NexoraApp.Converters"
              x:Class="NexoraApp.Views.TareaDetailPage"
              Title="Tarea">
+
+    <!-- Convertidores de valores (Clase 9): modelo -> vista -->
+    <ContentPage.Resources>
+        <conv:EstadoColorConverter x:Key="EstadoColor" />
+        <conv:PrioridadColorConverter x:Key="PrioridadColor" />
+        <conv:BoolATachadoConverter x:Key="BoolATachado" />
+        <conv:BoolAOpacidadConverter x:Key="BoolAOpacidad" />
+    </ContentPage.Resources>
 
     <ContentPage.ToolbarItems>
         <ToolbarItem Order="Primary" Priority="0" Clicked="OnEditarClicked"
@@ -17,37 +26,40 @@
 
             <!-- Encabezado -->
             <HorizontalStackLayout Spacing="8">
-                <Border x:Name="estadoChip" StrokeShape="RoundRectangle 12" StrokeThickness="0" Padding="10,4">
-                    <Label x:Name="estadoLabel" FontSize="12" FontAttributes="Bold" TextColor="#212121" />
+                <Border StrokeShape="RoundRectangle 12" StrokeThickness="0" Padding="10,4"
+                        BackgroundColor="{Binding Estado, Converter={StaticResource EstadoColor}}">
+                    <Label Text="{Binding Estado}" FontSize="12" FontAttributes="Bold" TextColor="#212121" />
                 </Border>
-                <Border x:Name="prioridadChip" StrokeShape="RoundRectangle 12" StrokeThickness="0" Padding="10,4">
-                    <Label x:Name="prioridadLabel" FontSize="12" FontAttributes="Bold" />
+                <Border StrokeShape="RoundRectangle 12" StrokeThickness="0" Padding="10,4"
+                        BackgroundColor="{Binding Prioridad, Converter={StaticResource PrioridadColor}}">
+                    <Label Text="{Binding PrioridadTexto}" FontSize="12" FontAttributes="Bold" />
                 </Border>
             </HorizontalStackLayout>
-            <Label x:Name="tituloLabel" FontSize="22" FontAttributes="Bold" />
-            <Label x:Name="descripcionLabel" FontSize="14" Opacity="0.8" />
+            <Label Text="{Binding Titulo}" FontSize="22" FontAttributes="Bold" />
+            <Label Text="{Binding Descripcion}" FontSize="14" Opacity="0.8" />
 
             <!-- Proyecto / Responsable / Fecha -->
             <Border StrokeShape="RoundRectangle 14" Padding="14">
                 <VerticalStackLayout Spacing="10">
                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
                         <Image Source="icono_carpeta.svg" WidthRequest="18" HeightRequest="18" />
-                        <Label x:Name="proyectoLabel" Grid.Column="1" TextDecorations="Underline">
+                        <Label Text="{Binding Proyecto}" Grid.Column="1" TextDecorations="Underline">
                             <Label.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="OnProyectoTapped" />
                             </Label.GestureRecognizers>
                         </Label>
                     </Grid>
                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
-                        <Border x:Name="avatar" WidthRequest="26" HeightRequest="26" StrokeShape="Ellipse" StrokeThickness="0">
-                            <Label x:Name="inicialesLabel" FontSize="10" FontAttributes="Bold" TextColor="#212121"
+                        <Border WidthRequest="26" HeightRequest="26" StrokeShape="Ellipse" StrokeThickness="0"
+                                BackgroundColor="{Binding AvatarColor}">
+                            <Label Text="{Binding Iniciales}" FontSize="10" FontAttributes="Bold" TextColor="#212121"
                                    HorizontalOptions="Center" VerticalOptions="Center" />
                         </Border>
-                        <Label x:Name="responsableLabel" Grid.Column="1" VerticalOptions="Center" />
+                        <Label Text="{Binding Responsable}" Grid.Column="1" VerticalOptions="Center" />
                     </Grid>
                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
                         <Image Source="icono_calendario_gris.svg" WidthRequest="18" HeightRequest="18" />
-                        <Label x:Name="fechaLabel" Grid.Column="1" />
+                        <Label Text="{Binding FechaTexto}" Grid.Column="1" />
                     </Grid>
                 </VerticalStackLayout>
             </Border>
@@ -59,19 +71,31 @@
             <!-- Subtareas -->
             <Grid ColumnDefinitions="*,Auto" Margin="0,8,0,0">
                 <Label Text="Subtareas" FontSize="16" FontAttributes="Bold" />
-                <Label x:Name="subtareasContador" Grid.Column="1" FontSize="13" Opacity="0.7" />
+                <Label Text="{Binding SubtareasContador}" Grid.Column="1" FontSize="13" Opacity="0.7" />
             </Grid>
-            <ProgressBar x:Name="subtareasBarra" ProgressColor="#E67514" />
-            <VerticalStackLayout x:Name="subtareasLayout" Spacing="2" />
+            <ProgressBar Progress="{Binding SubtareasProgreso}" ProgressColor="#E67514" />
+            <VerticalStackLayout Spacing="2" BindableLayout.ItemsSource="{Binding Subtareas}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="views:SubtareaItem">
+                        <HorizontalStackLayout Spacing="6">
+                            <!-- TwoWay: al marcar el CheckBox cambia Completada en el modelo -->
+                            <CheckBox IsChecked="{Binding Completada, Mode=TwoWay}" Color="#E67514" VerticalOptions="Center" />
+                            <Label Text="{Binding Titulo}" VerticalOptions="Center"
+                                   TextDecorations="{Binding Completada, Converter={StaticResource BoolATachado}}"
+                                   Opacity="{Binding Completada, Converter={StaticResource BoolAOpacidad}}" />
+                        </HorizontalStackLayout>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
-                <Entry x:Name="subtareaEntry" Placeholder="Nueva subtarea" ReturnType="Done" Completed="OnAgregarSubtarea" />
+                <Entry Text="{Binding NuevaSubtarea, Mode=TwoWay}" Placeholder="Nueva subtarea" ReturnType="Done" Completed="OnAgregarSubtarea" />
                 <Button Grid.Column="1" Text="Añadir" Clicked="OnAgregarSubtarea"
                         BackgroundColor="#E67514" TextColor="#212121" CornerRadius="20" />
             </Grid>
 
             <!-- Comentarios -->
-            <Label x:Name="comentariosTitulo" FontSize="16" FontAttributes="Bold" Margin="0,8,0,0" />
-            <VerticalStackLayout x:Name="listaComentarios" Spacing="10">
+            <Label Text="{Binding Comentarios.Count, StringFormat='Comentarios ({0})'}" FontSize="16" FontAttributes="Bold" Margin="0,8,0,0" />
+            <VerticalStackLayout Spacing="10" BindableLayout.ItemsSource="{Binding Comentarios}">
                 <BindableLayout.ItemTemplate>
                     <DataTemplate x:DataType="views:ComentarioItem">
                         <Border StrokeShape="RoundRectangle 14" Padding="12">
@@ -94,7 +118,7 @@
                 </BindableLayout.ItemTemplate>
             </VerticalStackLayout>
             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8" Margin="0,0,0,24">
-                <Entry x:Name="comentarioEntry" Placeholder="Escribe un comentario" ReturnType="Send" Completed="OnEnviarComentario" />
+                <Entry Text="{Binding NuevoComentario, Mode=TwoWay}" Placeholder="Escribe un comentario" ReturnType="Send" Completed="OnEnviarComentario" />
                 <Button Grid.Column="1" Text="Enviar" Clicked="OnEnviarComentario"
                         BackgroundColor="#E67514" TextColor="#212121" CornerRadius="20" />
             </Grid>
