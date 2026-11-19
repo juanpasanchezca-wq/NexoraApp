@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
+using System.Windows.Input;
 using Microsoft.EntityFrameworkCore;
 using NexoraApp.DataAccess;
 using NexoraApp.Helpers;
@@ -37,10 +38,6 @@ namespace NexoraApp.Views
             datos.Cargar();
             selectorEstado.Seleccionar(datos.Estado);
         }
-
-        private void OnAgregarSubtarea(object? sender, EventArgs e) => datos.AgregarSubtarea();
-
-        private void OnEnviarComentario(object? sender, EventArgs e) => datos.EnviarComentario();
 
         // Del detalle de la tarea se pasa al detalle de su proyecto
         private async void OnProyectoTapped(object? sender, TappedEventArgs e)
@@ -84,6 +81,9 @@ namespace NexoraApp.Views
         public int Id { get; }
         public string Titulo { get; }
 
+        // Comando compartido para quitar la subtarea (se enlaza con CommandParameter = Id)
+        public ICommand? EliminarCommand { get; set; }
+
         // El CheckBox la modifica (TwoWay) y el modelo se entera por PropertyChanged
         public bool Completada
         {
@@ -108,6 +108,25 @@ namespace NexoraApp.Views
         private string nuevaSubtarea = "";
         private string nuevoComentario = "";
         private bool cargando;
+
+        private readonly MiComando agregarSubtarea;
+        private readonly MiComando enviarComentario;
+
+        public TareaDetailData()
+        {
+            // Cada comando recibe: qué hacer (action) y cuándo se puede (canExecute)
+            agregarSubtarea = new MiComando(
+                _ => AgregarSubtarea(),
+                _ => !string.IsNullOrWhiteSpace(NuevaSubtarea));
+            enviarComentario = new MiComando(
+                _ => EnviarComentario(),
+                _ => !string.IsNullOrWhiteSpace(NuevoComentario));
+            EliminarSubtareaCommand = new MiComando(parametro => EliminarSubtarea(parametro));
+        }
+
+        public ICommand AgregarSubtareaCommand => agregarSubtarea;
+        public ICommand EnviarComentarioCommand => enviarComentario;
+        public ICommand EliminarSubtareaCommand { get; }
 
         public int TareaId { get; set; }
         public int ProyectoId { get; private set; }
@@ -135,8 +154,17 @@ namespace NexoraApp.Views
         public double SubtareasProgreso { get => subtareasProgreso; set => SetProperty(ref subtareasProgreso, value); }
 
         // Se enlazan en modo TwoWay con los Entry
-        public string NuevaSubtarea { get => nuevaSubtarea; set => SetProperty(ref nuevaSubtarea, value); }
-        public string NuevoComentario { get => nuevoComentario; set => SetProperty(ref nuevoComentario, value); }
+        public string NuevaSubtarea
+        {
+            get => nuevaSubtarea;
+            set { if (SetProperty(ref nuevaSubtarea, value)) agregarSubtarea.RaiseCanExecuteChanged(); }
+        }
+
+        public string NuevoComentario
+        {
+            get => nuevoComentario;
+            set { if (SetProperty(ref nuevoComentario, value)) enviarComentario.RaiseCanExecuteChanged(); }
+        }
 
         // Las colecciones observables avisan a la vista al agregar o quitar elementos
         public ObservableCollection<SubtareaItem> Subtareas { get; } = new();
@@ -187,11 +215,38 @@ namespace NexoraApp.Views
 
             foreach (var s in dbContext.Subtareas.Where(s => s.TareaId == TareaId).OrderBy(s => s.Id).ToList())
             {
-                var item = new SubtareaItem(s.Id, s.Titulo, s.Completada);
-                item.PropertyChanged += OnSubtareaCambio;
-                Subtareas.Add(item);
+                Subtareas.Add(CrearItem(s.Id, s.Titulo, s.Completada));
             }
             cargando = false;
+            ActualizarProgreso();
+        }
+
+        private SubtareaItem CrearItem(int id, string titulo, bool completada)
+        {
+            var item = new SubtareaItem(id, titulo, completada) { EliminarCommand = EliminarSubtareaCommand };
+            item.PropertyChanged += OnSubtareaCambio;
+            return item;
+        }
+
+        // CommandParameter: llega el Id de la subtarea que se tocó
+        private void EliminarSubtarea(object? parametro)
+        {
+            if (parametro is not int id) return;
+
+            var dbContext = new NexoraDbContext();
+            var subtarea = dbContext.Subtareas.FirstOrDefault(s => s.Id == id);
+            if (subtarea != null)
+            {
+                dbContext.Subtareas.Remove(subtarea);
+                dbContext.SaveChanges();
+            }
+
+            var item = Subtareas.FirstOrDefault(s => s.Id == id);
+            if (item != null)
+            {
+                item.PropertyChanged -= OnSubtareaCambio;
+                Subtareas.Remove(item);
+            }
             ActualizarProgreso();
         }
 
@@ -214,7 +269,7 @@ namespace NexoraApp.Views
             SubtareasProgreso = Subtareas.Count == 0 ? 0 : (double)hechas / Subtareas.Count;
         }
 
-        public void AgregarSubtarea()
+        private void AgregarSubtarea()
         {
             var texto = NuevaSubtarea.Trim();
             if (texto.Length == 0) return;
@@ -224,9 +279,7 @@ namespace NexoraApp.Views
             dbContext.Subtareas.Add(new Subtarea(id, TareaId, texto, false));
             dbContext.SaveChanges();
 
-            var item = new SubtareaItem(id, texto, false);
-            item.PropertyChanged += OnSubtareaCambio;
-            Subtareas.Add(item);          // la vista se actualiza sola
+            Subtareas.Add(CrearItem(id, texto, false));   // la vista se actualiza sola
             ActualizarProgreso();
             NuevaSubtarea = "";           // y el Entry se limpia por el binding
         }
@@ -244,7 +297,7 @@ namespace NexoraApp.Views
             new(Estilos.Iniciales(autor), Estilos.ColorAvatar(c.UsuarioId), autor, c.Texto,
                 c.Fecha.ToString("d MMM, HH:mm", new CultureInfo("es-ES")));
 
-        public void EnviarComentario()
+        private void EnviarComentario()
         {
             var texto = NuevoComentario.Trim();
             if (texto.Length == 0) return;
