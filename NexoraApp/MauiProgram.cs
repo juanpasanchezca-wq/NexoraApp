@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Logging;
 using NexoraApp.DataAccess;
+using NexoraApp.Services;
+using NexoraApp.ViewModels;
 using NexoraApp.Views;
 
 namespace NexoraApp
@@ -20,6 +22,13 @@ namespace NexoraApp
 #if DEBUG
             builder.Logging.AddDebug();
 #endif
+
+            // Contenedor de dependencias (Clase 11)
+            //  Singleton: una sola instancia para toda la app (servicios)
+            //  Transient: instancia nueva cada vez que se pide (vistas y ViewModels)
+            builder.Services.AddSingleton<INavegacionService, NavegacionService>();
+            builder.Services.AddTransient<TareaDetailViewModel>();
+            builder.Services.AddTransient<TareaDetailPage>();
 
             // Crea la base de datos en memoria y carga los datos iniciales (HasData)
             var dbContext = new NexoraDbContext();

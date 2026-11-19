@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:views="clr-namespace:NexoraApp.Views"
              xmlns:conv="clr-namespace:NexoraApp.Converters"
+             xmlns:vm="clr-namespace:NexoraApp.ViewModels"
              x:Class="NexoraApp.Views.TareaDetailPage"
              Title="Tarea">
 
@@ -15,9 +16,9 @@
     </ContentPage.Resources>
 
     <ContentPage.ToolbarItems>
-        <ToolbarItem Order="Primary" Priority="0" Clicked="OnEditarClicked"
+        <ToolbarItem Order="Primary" Priority="0" Command="{Binding EditarTareaCommand}"
                      IconImageSource="{AppThemeBinding Light=icono_editar.svg, Dark=icono_editar_claro.svg}" />
-        <ToolbarItem Order="Primary" Priority="1" Clicked="OnEliminarClicked"
+        <ToolbarItem Order="Primary" Priority="1" Command="{Binding EliminarTareaCommand}"
                      IconImageSource="{AppThemeBinding Light=icono_eliminar.svg, Dark=icono_eliminar_claro.svg}" />
     </ContentPage.ToolbarItems>
 
@@ -45,7 +46,7 @@
                         <Image Source="icono_carpeta.svg" WidthRequest="18" HeightRequest="18" />
                         <Label Text="{Binding Proyecto}" Grid.Column="1" TextDecorations="Underline">
                             <Label.GestureRecognizers>
-                                <TapGestureRecognizer Tapped="OnProyectoTapped" />
+                                <TapGestureRecognizer Command="{Binding IrAProyectoCommand}" />
                             </Label.GestureRecognizers>
                         </Label>
                     </Grid>
@@ -76,7 +77,7 @@
             <ProgressBar Progress="{Binding SubtareasProgreso}" ProgressColor="#E67514" />
             <VerticalStackLayout Spacing="2" BindableLayout.ItemsSource="{Binding Subtareas}">
                 <BindableLayout.ItemTemplate>
-                    <DataTemplate x:DataType="views:SubtareaItem">
+                    <DataTemplate x:DataType="vm:SubtareaItem">
                         <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="6">
                             <!-- TwoWay: al marcar el CheckBox cambia Completada en el modelo -->
                             <CheckBox Grid.Column="0" IsChecked="{Binding Completada, Mode=TwoWay}" Color="#E67514" VerticalOptions="Center" />
