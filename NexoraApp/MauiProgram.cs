@@ -30,7 +30,8 @@ namespace NexoraApp
             builder.Services.AddTransient<TareaDetailViewModel>();
             builder.Services.AddTransient<TareaDetailPage>();
 
-            // Crea la base de datos en memoria y carga los datos iniciales (HasData)
+            // Crea el archivo SQLite la primera vez y carga los datos iniciales (HasData).
+            // Si el archivo ya existe, se conservan los datos guardados.
             var dbContext = new NexoraDbContext();
             dbContext.Database.EnsureCreated();
             dbContext.Dispose();

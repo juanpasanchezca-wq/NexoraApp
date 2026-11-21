@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using NexoraApp.Helpers;
 
 namespace NexoraApp.DataAccess
 {
@@ -19,7 +20,8 @@ namespace NexoraApp.DataAccess
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseInMemoryDatabase("NexoraDb");
+            // SQLite: los datos quedan guardados en un archivo y sobreviven al cerrar la app (Clase 14)
+            optionsBuilder.UseSqlite($"Data Source={UbicacionBd.Ruta}");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
