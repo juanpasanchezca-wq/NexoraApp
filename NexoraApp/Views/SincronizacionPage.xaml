@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NexoraApp.Views.SincronizacionPage"
+             Title="Sincronización">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="14">
+
+            <Label Text="Servidor" FontSize="16" FontAttributes="Bold" />
+            <Entry Text="{Binding UrlServidor, Mode=TwoWay}" Placeholder="http://10.0.2.2:8080"
+                   Keyboard="Url" ClearButtonVisibility="WhileEditing" />
+            <Label Text="Emulador de Android: http://10.0.2.2:8080 · Windows: http://localhost:8080 · Celular real: la IP del PC"
+                   FontSize="12" Opacity="0.7" />
+
+            <!-- Estado de la conexión -->
+            <Border StrokeShape="RoundRectangle 14" Padding="14">
+                <VerticalStackLayout Spacing="8">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <BoxView WidthRequest="12" HeightRequest="12" CornerRadius="6"
+                                 Color="{Binding ColorConexion}" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Text="{Binding EstadoConexion}" FontAttributes="Bold" />
+                    </Grid>
+                    <Label Text="{Binding TareasLocales}" FontSize="13" Opacity="0.8" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Button Text="Enviar tareas al servidor" Command="{Binding EnviarCommand}"
+                    BackgroundColor="#E67514" TextColor="#212121" CornerRadius="22" />
+            <Button Text="Traer tareas del servidor" Command="{Binding TraerCommand}"
+                    BackgroundColor="#D3ECCD" TextColor="#212121" CornerRadius="22" />
+
+            <ActivityIndicator IsRunning="{Binding Ocupado}" IsVisible="{Binding Ocupado}" Color="#E67514" />
+            <Label Text="{Binding Mensaje}" FontSize="14" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

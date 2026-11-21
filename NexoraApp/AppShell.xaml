@@ -75,6 +75,11 @@
         Route="EquipoPage" />
 
     <ShellContent
+        Title="Sincronización"
+        ContentTemplate="{DataTemplate views:SincronizacionPage}"
+        Route="SincronizacionPage" />
+
+    <ShellContent
         Title="Acerca de Nexora"
         ContentTemplate="{DataTemplate views:AboutPage}"
         Route="AboutPage" />

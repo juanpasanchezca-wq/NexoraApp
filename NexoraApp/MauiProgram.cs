@@ -30,6 +30,11 @@ namespace NexoraApp
             builder.Services.AddTransient<TareaDetailViewModel>();
             builder.Services.AddTransient<TareaDetailPage>();
 
+            // Backend y conectividad (Clase 13)
+            builder.Services.AddSingleton<ISincronizacionService, SincronizacionService>();
+            builder.Services.AddTransient<SincronizacionViewModel>();
+            builder.Services.AddTransient<SincronizacionPage>();
+
             // Crea el archivo SQLite la primera vez y carga los datos iniciales (HasData).
             // Si el archivo ya existe, se conservan los datos guardados.
             var dbContext = new NexoraDbContext();
