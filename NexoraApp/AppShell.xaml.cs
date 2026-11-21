@@ -25,6 +25,12 @@ namespace NexoraApp
             await Shell.Current.DisplayAlert("Modo de prueba", $"{modo}.\nCambia de pestaña (Proyectos o Tareas) para verlo.", "Entendido");
         }
 
+        private async void CerrarSesion_Clicked(object sender, EventArgs e)
+        {
+            Shell.Current.FlyoutIsPresented = false;
+            await Sesion.CerrarConConfirmacionAsync();
+        }
+
         private async void MenuItem_Clicked(object sender, EventArgs e)
         {
             var uri = new Uri("https://learn.microsoft.com/dotnet/maui/");

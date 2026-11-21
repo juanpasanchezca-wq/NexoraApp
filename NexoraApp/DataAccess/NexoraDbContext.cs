@@ -24,15 +24,19 @@ namespace NexoraApp.DataAccess
             optionsBuilder.UseSqlite($"Data Source={UbicacionBd.Ruta}");
         }
 
+        // Usuario de ejemplo con su contraseña ya convertida en hash
+        private static Usuario Nuevo(int id, string nombre, string correo, string rol) =>
+            new Usuario(id, nombre, correo, rol) { ContrasenaHash = Seguridad.Hash(correo, Seguridad.ContrasenaDemo) };
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Usuario>().HasData(
-                new Usuario(1, "Laura Méndez", "laura.mendez@nexora.app", "Administrador"),
-                new Usuario(2, "Carlos Ruiz", "carlos.ruiz@nexora.app", "Líder de proyecto"),
-                new Usuario(3, "Sofía Torres", "sofia.torres@nexora.app", "Miembro"),
-                new Usuario(4, "Diego Fernández", "diego.fernandez@nexora.app", "Miembro"),
-                new Usuario(5, "Valentina Gómez", "valentina.gomez@nexora.app", "Líder de proyecto"),
-                new Usuario(6, "Andrés Castillo", "andres.castillo@nexora.app", "Miembro")
+                Nuevo(1, "Laura Méndez", "laura.mendez@nexora.app", "Administrador"),
+                Nuevo(2, "Carlos Ruiz", "carlos.ruiz@nexora.app", "Líder de proyecto"),
+                Nuevo(3, "Sofía Torres", "sofia.torres@nexora.app", "Miembro"),
+                Nuevo(4, "Diego Fernández", "diego.fernandez@nexora.app", "Miembro"),
+                Nuevo(5, "Valentina Gómez", "valentina.gomez@nexora.app", "Líder de proyecto"),
+                Nuevo(6, "Andrés Castillo", "andres.castillo@nexora.app", "Miembro")
             );
 
             modelBuilder.Entity<Proyecto>().HasData(
@@ -94,7 +98,11 @@ namespace NexoraApp.DataAccess
         }
     }
 
-    public record Usuario(int Id, string Nombre, string Correo, string Rol);
+    public record Usuario(int Id, string Nombre, string Correo, string Rol)
+    {
+        // Nunca se guarda la contraseña, solo su hash
+        public string ContrasenaHash { get; set; } = "";
+    }
 
     public record Proyecto(int Id, string Nombre, string Descripcion, DateTime FechaInicio, DateTime FechaFin, string Estado, int ResponsableId)
     {

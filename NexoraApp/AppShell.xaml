@@ -38,6 +38,13 @@
         </VerticalStackLayout>
     </Shell.FlyoutFooter>
 
+    <!-- Pantalla de acceso: es la primera que se ve y no aparece en el menú -->
+    <ShellContent
+        Title="Acceso"
+        ContentTemplate="{DataTemplate views:LoginPage}"
+        Route="LoginPage"
+        FlyoutItemIsVisible="False" />
+
     <!-- Barra de pestañas: Inicio, Proyectos, Tareas y Perfil -->
     <FlyoutItem Title="Nexora">
         <Tab Title="Inicio" Icon="icono_inicio.svg">
@@ -83,6 +90,11 @@
         Title="Acerca de Nexora"
         ContentTemplate="{DataTemplate views:AboutPage}"
         Route="AboutPage" />
+
+    <!-- Salir de la cuenta -->
+    <MenuItem
+        Text="Cerrar sesión"
+        Clicked="CerrarSesion_Clicked" />
 
     <!-- Demostración de los estados vacío y error -->
     <MenuItem

@@ -77,6 +77,11 @@ namespace NexoraApp.Views
             Cargar();
         }
 
+        private async void OnCerrarSesionClicked(object? sender, EventArgs e)
+        {
+            await Sesion.CerrarConConfirmacionAsync();
+        }
+
         private async void OnVerNotificacionesTapped(object? sender, TappedEventArgs e)
         {
             await Shell.Current.GoToAsync(nameof(NotificacionesPage));

@@ -30,6 +30,10 @@ namespace NexoraApp
             builder.Services.AddTransient<TareaDetailViewModel>();
             builder.Services.AddTransient<TareaDetailPage>();
 
+            // Inicio de sesión
+            builder.Services.AddTransient<LoginViewModel>();
+            builder.Services.AddTransient<LoginPage>();
+
             // Backend y conectividad (Clase 13)
             builder.Services.AddSingleton<ISincronizacionService, SincronizacionService>();
             builder.Services.AddTransient<SincronizacionViewModel>();

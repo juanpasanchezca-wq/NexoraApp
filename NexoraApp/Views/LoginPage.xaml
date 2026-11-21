@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NexoraApp.Views.LoginPage"
+             Title="Acceso"
+             Shell.FlyoutBehavior="Disabled"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="14" VerticalOptions="Center">
+
+            <Border WidthRequest="72" HeightRequest="72" StrokeShape="RoundRectangle 20" StrokeThickness="0"
+                    BackgroundColor="#E67514" HorizontalOptions="Center">
+                <Label Text="N" FontSize="40" FontAttributes="Bold" TextColor="#212121"
+                       HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+            <Label Text="Nexora" FontSize="28" FontAttributes="Bold" HorizontalOptions="Center" />
+            <Label Text="Inicia sesión para continuar" FontSize="14" Opacity="0.7" HorizontalOptions="Center" />
+
+            <Label Text="Correo" FontAttributes="Bold" Margin="0,12,0,0" />
+            <Entry Text="{Binding Correo, Mode=TwoWay}" Placeholder="tucorreo@nexora.app"
+                   Keyboard="Email" ClearButtonVisibility="WhileEditing" />
+
+            <Label Text="Contraseña" FontAttributes="Bold" />
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                <Entry Text="{Binding Contrasena, Mode=TwoWay}" Placeholder="Tu contraseña"
+                       IsPassword="{Binding OcultarContrasena}"
+                       ReturnType="Go" ReturnCommand="{Binding IniciarSesionCommand}" />
+                <Label Grid.Column="1" Text="{Binding TextoMostrar}" TextColor="#E67514" FontAttributes="Bold"
+                       VerticalOptions="Center" Padding="6,0">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding AlternarContrasenaCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </Grid>
+
+            <Label Text="{Binding MensajeError}" IsVisible="{Binding HayError}" TextColor="#D32F2F" FontSize="13" />
+
+            <Button Text="Iniciar sesión" Command="{Binding IniciarSesionCommand}"
+                    BackgroundColor="#E67514" TextColor="#212121" CornerRadius="24" Margin="0,8,0,0" />
+
+            <Border StrokeShape="RoundRectangle 12" Padding="12" Margin="0,16,0,0">
+                <VerticalStackLayout Spacing="2">
+                    <Label Text="Cuenta de prueba" FontSize="12" FontAttributes="Bold" />
+                    <Label Text="laura.mendez@nexora.app" FontSize="12" />
+                    <Label Text="Contraseña: Nexora123" FontSize="12" />
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
