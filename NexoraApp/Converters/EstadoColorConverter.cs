@@ -6,7 +6,7 @@ using System.Text;
 
 namespace NexoraApp.Converters
 {
-    internal class EstadoColorConverterIValueConverter
+    public class EstadoColorConverter : IValueConverter
     {
         public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
             => Estilos.ColorEstadoTarea(value as string ?? "");

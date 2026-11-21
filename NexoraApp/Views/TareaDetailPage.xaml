@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:views="clr-namespace:NexoraApp.Views"
              xmlns:conv="clr-namespace:NexoraApp.Converters"
-             xmlns:vm="clr-namespace:NexoraApp.ViewModels"
              x:Class="NexoraApp.Views.TareaDetailPage"
              Title="Tarea">
 
@@ -77,14 +76,12 @@
             <ProgressBar Progress="{Binding SubtareasProgreso}" ProgressColor="#E67514" />
             <VerticalStackLayout Spacing="2" BindableLayout.ItemsSource="{Binding Subtareas}">
                 <BindableLayout.ItemTemplate>
-                    <DataTemplate x:DataType="vm:SubtareaItem">
+                    <DataTemplate>
                         <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="6">
-                            <!-- TwoWay: al marcar el CheckBox cambia Completada en el modelo -->
                             <CheckBox Grid.Column="0" IsChecked="{Binding Completada, Mode=TwoWay}" Color="#E67514" VerticalOptions="Center" />
                             <Label Grid.Column="1" Text="{Binding Titulo}" VerticalOptions="Center"
                                    TextDecorations="{Binding Completada, Converter={StaticResource BoolATachado}}"
                                    Opacity="{Binding Completada, Converter={StaticResource BoolAOpacidad}}" />
-                            <!-- Command + CommandParameter: quita esta subtarea -->
                             <Label Grid.Column="2" Text="✕" FontSize="16" Opacity="0.6" VerticalOptions="Center" Padding="8,0">
                                 <Label.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding EliminarCommand}" CommandParameter="{Binding Id}" />
